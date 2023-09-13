@@ -37,8 +37,8 @@ deployment_name = "gpt-35-turbo-16k"  # This will correspond to the custom name 
 
 functions = [
     {
-        "name": "take_picture",
-        "description": "Returns a picture taken with the robot's camera facing the direction the camera is currently facing.",
+        "name": "send_picture_to_user",
+        "description": "Sends a picture to the user. The picture is taken with the robot's camera facing the direction the camera is currently facing.",
         "parameters": {},
     },
     {
@@ -57,16 +57,28 @@ functions = [
     },
     {
         "name": "rotate_robot_camera",
-        "description": "Rotates the robot's camera a certain number of degrees.",
+        "description": "Rotates the robot's camera to center in frame a given bounding box defined by dimensions x, y, w, and h.",
         "parameters": {
             "type": "object",
             "properties": {
-                "degrees": {
+                "x": {
                     "type": "number",
-                    "description": "The number of degrees to rotate the robot's camera.",
-                }
+                    "description": "The x coordinate of the bounding box of the object.",
+                },
+                "y": {
+                    "type": "number",
+                    "description": "The y coordinate of the bounding box of the object.",
+                },
+                "w": {
+                    "type": "number",
+                    "description": "The w coordinate of the bounding box of the object.",
+                },
+                "h": {
+                    "type": "number",
+                    "description": "The h coordinate of the bounding box of the object.",
+                },
             },
-            "required": ["degrees"],
+            "required": ["x", "y", "w", "h"],
         },
     },
     {
@@ -99,27 +111,13 @@ functions = [
         "parameters": {},
     },
     {
-        "name": "prompt_user_for_input",
-        "description": "Prompts the user for input with a clarifying question.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "question": {
-                    "type": "string",
-                    "description": "The question to ask the user.",
-                }
-            },
-            "required": ["question"],
-        },
-    },
-    {
         "name": "end_session_with_success",
-        "description": "Ends the session with success.",
+        "description": "Ends the session with success. This should be called when the user's goal has been achieved and the human user is satisfied.",
         "parameters": {},
     },
     {
         "name": "end_session_with_failure",
-        "description": "Ends the session with failure and a message describing why the session failed.",
+        "description": "Ends the session with failure and a message describing why the session failed. This should be called when all feasible actions have been tried and the user's goal has not been achieved.",
         "parameters": {
             "type": "object",
             "properties": {
@@ -132,9 +130,27 @@ functions = [
         },
     },
     {
-        "name": "vision_api_ocr",
-        "description": "Returns the text in a new image taken with the robot's camera in the direction that the camera is currently facing.",
+        "name": "vision_api_ocr_print_out_all_text",
+        "description": "Returns just all of the raw text in a new image taken with the robot's camera in the direction that the camera is currently facing.",
         "parameters": {},
+    },
+    {
+        "name": "vision_api_ocr_print_out_all_text_specific_location_bounding_boxes",
+        "description": "Returns all of the raw text along with its associated bounding boxes in a new image taken with the robot's camera in the direction that the camera is currently facing.",
+        "parameters": {},
+    },
+    {
+        "name": "vision_api_ocr_find_text_specific_location_bounding_boxes",
+        "description": "Given a string, find an instance of that printed text along with its associated bounding box in a new image taken with the robot's camera in the direction that the camera is currently facing.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "The text to find in the image.",
+                }
+            },
+        },
     },
     {
         "name": "vision_api_image_analysis_generic_caption",
@@ -147,8 +163,8 @@ functions = [
         "parameters": {},
     },
     {
-        "name": "vision_api_image_analysis_specific_location_bounding_boxes",
-        "description": "Returns the bounding boxes for specific locations in a new image taken with the robot's camera in the direction that the camera is currently facing.",
+        "name": "vision_api_image_analysis_specific_object_bounding_boxes",
+        "description": "Returns the bounding boxes for specific objects in a new image taken with the robot's camera in the direction that the camera is currently facing.",
         "parameters": {},
     },
     {
@@ -182,7 +198,33 @@ response = openai.ChatCompletion.create(
     messages=[
         {
             "role": "system",
-            "content": "You control a robot that responds to the request of the user. You will take a series of actions to complete the tasks. The robot has a camera, and there are a 3 APIs you may call on the image taken from the robot's camera. You should decide the series of actions to take. The Optical Character Recognition (OCR) service extracts text from images. You can use the new Read API to extract printed and handwritten text from photos and documents. It uses deep-learning-based models and works with text on various surfaces and backgrounds. These include business documents, invoices, receipts, posters, business cards, letters, and whiteboards. The Image Analysis service extracts many visual features from images, such as objects, faces, adult content, and auto-generated text descriptions. Follow the Image Analysis quickstart to get started. The Face service provides AI algorithms that detect, recognize, and analyze human faces in images. Facial recognition software is important in many different scenarios, such as identity verification, touchless access control, and face blurring for privacy. The Spatial Analysis service analyzes the presence and movement of people on a video feed and produces events that other systems can respond to.",
+            "content": 'You are controlling a helpful and benevolent robot to serve human requests to the best of your ability in the most effective and efficient manner possible. The initial requests will not follow any strict template and may be extremely varied. They will be provided in natural speech. The information provided to you will be a list of messages which will detail what has happened so far in the session. You will have to keep track of a "Goal" (what the human currently wants to be accomplished). You will be given a list of "Functions" (all of the possible actions the robot can take and the list of actions you can choose from). You are to always choose the most appropriate action from the list of "Functions" informed by the current context and what has happened in the past in the message history. The "Goal" may be changed by feedback from the human user only. This process will consist mostly of a feedback loop between you, the robot\'s hardware feedback, AI Computer Vision API function calls, and human user input. When interpreting the results from the AI Computer Vision API, know that the results may be slightly incomplete or certain words may be misspelled or missing. You will have to problem solve and try to use real-world logic to achieve a success state. Only in the case that all feasible actions have been tried and the user\'s goal has not been achieved should you end the session with failure. Here is an example situation: '
+            + "role: user: I am thirsty. I want to drink something.\n"
+            + "role: assistant: What kind of drink would you like?\n"
+            + "role: user: Something healthy. I'm on a diet\n"
+            + "role: assistant: content: null func_call: vision_api_image_analysis_generic_caption\n"
+            + "role: function: name: vision_api_image_analysis_generic_caption content: recycle bin and trash can\n"
+            + "role: assistant: content: null func_call: rotate_robot_camera parameters: degrees: 180\n"
+            + "role: function: name: vision_api_image_analysis_generic_caption content: several cans of soda on a table\n"
+            + "role: assistant: content: null func_call: vision_api_image_analysis_dense_caption\n"
+            + "role: function: name: vision_api_image_analysis_dense_caption content: yellow can\na red can of soda\nwhite and blue container\ngreen soda can\n"
+            + "role: assistant: content: null func_call: vision_api_ocr_print_out_all_text\n"
+            + "role: function: name: vision_api_ocr_print_out_all_text content: Lemonade\n"
+            + "role: assistant: content: null func_call: zoom_in\n"
+            + "role: function: name: zoom_in content: null\n"
+            + "role: assistant: content: null func_call: vision_api_ocr_print_out_all_text\n"
+            + "role: function: name: vision_api_ocr_print_out_all_text content: Lemonade Nutrition Facts Serving Size 1 Calories 5 Sodium Coca-Cola Nutrition Facts Serving Calories 140 Total Fat Vita Coco 330 mL Nutrition Facts Calories 60 %Daily Value Sprite Caffeine free Nutrition Facts Calories 120\n"
+            + "role: assistant: content: null func_call: vision_api_ocr_find_text_specific_location_bounding_boxes parameters: text: Lemonade\n"
+            + "role: function: name: vision_api_ocr_find_text_specific_location_bounding_boxes content: Rectangle(x=830, y=530, w=400, h=230)\n"
+            + "role: assistant: content: null func_call: rotate_robot_camera parameters: x: 830 y: 530 w: 400 h: 230\n"
+            + "role: function: name: rotate_robot_camera content: null\n"
+            + "role: assistant: content: null func_call: point_at_object\n"
+            + "role: function: name: point_at_object content: null\n"
+            + "role: assistant: content: null func_call: send_picture_to_user\n"
+            + "role: function: name: send_picture_to_user content: null\n"
+            + "role: assistant: content: I found a can of lemonade that has 5 calories. Would you like this drink?\n"
+            + "role: user: Yes, I would like that drink.\n"
+            + "role: assistant: content: null func_call: end_session_with_success\n",
         },
         {"role": "user", "content": "Find the lowest calorie item on the menu."},
     ],
@@ -205,7 +247,8 @@ print(response["choices"][0]["message"]["content"])
 # - End session with success
 # - End session with failure
 
-# - Vision API: OCR
+# - Vision API: OCR (Print out all text)
+# - Vision API: OCR (Print out all text associated with specific location bounding boxes)
 # - Vision API: Image Analysis (Generic caption)
 # - Vision API: Image Analysis (Dense caption)
 # - Vision API: Image Analysis (Specific location bounding boxes)
