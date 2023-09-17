@@ -14,75 +14,126 @@ from langchain.llms import AzureOpenAI
 # tools = load_tools(["llm-math"], llm=llm)
 # agent.run("What 20 raised to the 2 power?")
 swagger_file_path="Vision\VisionAPISwagger.json"
+
+import json
+
+# @tool
+def read_swagger_file_to_string() -> str:
+    """
+    This function reads the swagger file in JSON format to a dictionary. Before you use other tools or call other functions to get detailed information of each API, you must call this function first.
+    Moreover, you only need to call this function once, and you can reuse the returned dictionary, swagger_data, for other functions or tools.  The parameter for this function is always "Vision\VisionAPISwagger.json".
+    """
+    filename = swagger_file_path
+    with open(filename, 'r') as file:
+        swagger_data = json.load(file)
+    return json.dumps(swagger_data)
+
 @tool
-def extract_api_descriptions(swagger_file_path: str):
+def extract_endpoints_and_methods_string(swagger_data_str: str) -> str:
     """
-    You can safely ignore the swagger_file_path, if you need to call this function, just pass in the "Vision\VisionAPISwagger.json"
-    This function gets a list of existing Azure Computer Vision API paths and descriptions
-    It returns the "HTTP method/endpoint" as its key, and the description of this API as its value
+    This function gets all the API endpoints and methods from the swagger data, a dictionary, and returns each API's endpoint and method as a key value pair in a dictionary.
     """
-    import json
-    descriptions = {}
 
-    try:
-        # Load the Swagger JSON file into a Python dictionary
-        with open(swagger_file_path, 'r', encoding="utf-8") as f:
-            swagger_data = json.load(f)
+    swagger_data = json.loads(read_swagger_file_to_string())
+    endpoints_methods = {}
+    paths = swagger_data.get('paths', {})
 
-        # Check if the Swagger data contains the 'paths' field
-        if 'paths' not in swagger_data:
-            print("The Swagger file doesn't contain the 'paths' field.")
-            return
+    for path, methods in paths.items():
+        endpoints_methods[path] = list(methods.keys())
 
-        # Loop through each path and its methods to extract descriptions
-        for path, methods in swagger_data['paths'].items():
-            for method, details in methods.items():
-                endpoint = f"{method.upper()} {path}"
-                description = details.get('description', 'No description available')
-                descriptions[endpoint] = description
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-    return descriptions
-
-tools = [extract_api_descriptions]
+    return json.dumps(endpoints_methods)
 
 
+@tool
+def extract_parameters_string(swagger_data_str: str) -> str:
+    """
+    This functions extracts each API's parameter you must pass into in order to call the API.
+    """
+
+    swagger_data = json.loads(read_swagger_file_to_string())
+    endpoint_parameters = {}
+    paths = swagger_data.get('paths', {})
+    
+    for path, methods in paths.items():
+        for method, details in methods.items():
+            params = details.get('parameters', [])
+            extracted_params = []
+            for param in params:
+                param_name = param.get('name', 'Unnamed')
+                param_type = param.get('in', 'Unknown')
+                param_required = param.get('required', False)
+                extracted_params.append({
+                    'name': param_name,
+                    'type': param_type,
+                    'required': param_required
+                })
+            endpoint_key = f"{path}::{method.upper()}"
+            endpoint_parameters[endpoint_key] = extracted_params
+    
+    return json.dumps(endpoint_parameters)
+
+@tool
+def extract_response_status_codes_string(swagger_data_str: str) -> str:
+    """
+    This function extracts each API's response and its status code. You can learn what to expect from calling each API.
+    """
+
+    swagger_data = json.loads(read_swagger_file_to_string())
+    endpoint_responses = {}
+    paths = swagger_data.get('paths', {})
+    
+    for path, methods in paths.items():
+        for method, details in methods.items():
+            responses = details.get('responses', {})
+            status_codes = {}
+            for status_code, response_details in responses.items():
+                description = response_details.get('description', 'No description provided')
+                status_codes[status_code] = description
+            endpoint_key = f"{path}::{method.upper()}"
+            endpoint_responses[endpoint_key] = status_codes
+            
+    return json.dumps(endpoint_responses)
+
+@tool
+def extract_request_body_schema_string(swagger_data_str: str) -> str:
+    """
+    This function gets each api's request body schema
+    """
+
+    swagger_data = json.loads(read_swagger_file_to_string())
+    endpoint_request_body = {}
+    paths = swagger_data.get('paths', {})
+    
+    for path, methods in paths.items():
+        for method, details in methods.items():
+            request_body = details.get('requestBody', {})
+            schema = request_body.get('content', {}).get('application/json', {}).get('schema', {})
+            endpoint_key = f"{path}::{method.upper()}"
+            endpoint_request_body[endpoint_key] = schema
+    
+    return json.dumps(endpoint_request_body)
+
+@tool
+def search_product_info(product_name: str) -> str:
+    """
+    This function browse the web to search the information related to a product
+    """
+
+    return "The rela"
+
+tools = [extract_endpoints_and_methods_string, extract_parameters_string, extract_response_status_codes_string, extract_request_body_schema_string]
 agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
-agent.run("What are the APIs details in the azure computer vision api")
 
-# description = extract_api_descriptions("Vision\VisionAPISwagger.json")
-# print(description)
+agent.run("I want to find the lowest caloried drink in an image")
+# swagger_data = read_swagger_file("random")
+# endpoints = extract_endpoints_and_methods(swagger_data)
+# parameters = extract_parameters(swagger_data)
+# response_info = extract_response_status_codes(swagger_data)
 
-# def get_endpoint_details(query: str) -> str:
-#     """ This function takes the API name and method as input and returns the corresponding API details, including parameters, request headers, and a summary. 
-#     These details can be further utilized to construct the correct parameters, headers, and body required to call the endpoint accurately.
-#     This function should only be invoked when specific endpoint information is needed. The expected format for the input is "<path>,<method>".
+# print("==============endpoints==============")
+# print(endpoints)
+# print("=============parameters==============")
+# print(parameters)
+# print("=============responseinfo============")
+# print(response_info)
 
-#     Inputs:
-#         1. "/xyz,post"
-#         2. "/askdjhad,get"
-#     """
-#     import json
-#     try:
-#         vals = query.split(",")
-#         resp = json.load(open(os.path.join(os.path.dirname(current_path), "swagger.json")))
-#         for item in resp["paths"]:
-#             for method, val in resp["paths"][item].items():
-#                 if method == vals[1].strip() and vals[0].strip() == item:
-#                     val.pop("description", None)
-#                     val.pop("responses", None)
-#                     val["name"] = vals[0].strip()
-#                     val["method"] = vals[1].strip()
-#                     return json.dumps(val)
-                
-#         resp = json.load(open(os.path.join(os.path.dirname(current_path), "swagger_cv.json")))
-#         for item in resp["paths"]:
-#             for method, val in resp["paths"][item].items():
-#                 if method == vals[1].strip() and vals[0].strip() == item:
-#                     val.pop("description", None)
-#                     val.pop("responses", None)
-#                     return json.dumps(val)
-#         return f"\n\nThe input is invalid. It is likely that you have called the wrong tool or provided an input in the wrong format. The accepted format is: <path>,<method>."
-#     except Exception as e:
-#         return f"\nException: {e} \n The input is invalid. It is likely that you have called the wrong tool or provided an input in the wrong format. The accepted format is: <path>,<method>."

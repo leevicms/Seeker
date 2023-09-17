@@ -1,12 +1,12 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Computer Vision API (v1.0)",
-        "version": "v1.0",
-        "description": "The Computer Vision API provides state-of-the-art algorithms to process images and return information.  For example, it can be used to determine if an image contains mature content, or it can be used to find all the faces in an image.  It also has other features like estimating dominant and accent colors, categorizing the content of images, and describing an image with complete English sentences.  Additionally, it can also intelligently generate images thumbnails for displaying large images effectively.\r\n\r\nThis API is currently available in:\r\n\r\n* Australia East - australiaeast.api.cognitive.microsoft.com\r\n* Brazil South - brazilsouth.api.cognitive.microsoft.com\r\n* Canada Central - canadacentral.api.cognitive.microsoft.com\r\n* Central India - centralindia.api.cognitive.microsoft.com\r\n* Central US - centralus.api.cognitive.microsoft.com\r\n* East Asia - eastasia.api.cognitive.microsoft.com\r\n* East US - eastus.api.cognitive.microsoft.com\r\n* East US 2 - eastus2.api.cognitive.microsoft.com\r\n* France Central - francecentral.api.cognitive.microsoft.com\r\n* Japan East - japaneast.api.cognitive.microsoft.com\r\n* Japan West - japanwest.api.cognitive.microsoft.com\r\n* Korea Central - koreacentral.api.cognitive.microsoft.com\r\n* North Central US - northcentralus.api.cognitive.microsoft.com\r\n* North Europe - northeurope.api.cognitive.microsoft.com\r\n* South Africa North - southafricanorth.api.cognitive.microsoft.com\r\n* South Central US - southcentralus.api.cognitive.microsoft.com\r\n* Southeast Asia - southeastasia.api.cognitive.microsoft.com\r\n* UK South - uksouth.api.cognitive.microsoft.com\r\n* West Central US - westcentralus.api.cognitive.microsoft.com\r\n* West Europe - westeurope.api.cognitive.microsoft.com\r\n* West US - westus.api.cognitive.microsoft.com\r\n* West US 2 - westus2.api.cognitive.microsoft.com"
+        "title": "Computer Vision API (2023-04-01-preview)",
+        "version": "2023-04-01-preview",
+        "description": "The Computer Vision API provides state-of-the-art algorithms to process images and return information. For example, it can be used to extract text using Read OCR, caption an image using descriptive natural language, detect objects, people, and more."
     },
-    "host": "cognitive-wu.cognitiveservices.azure.com",
-    "basePath": "/vision/v1.0",
+    "host": "cognitiveuseprod.cognitiveservices.azure.com",
+    "basePath": "/computervision",
     "schemes": [
         "https"
     ],
@@ -32,239 +32,750 @@
     ],
     "x-servers": [
         {
-            "url": "https://cognitive-wu.cognitiveservices.azure.com"
+            "url": "https://cognitiveuseprod.cognitiveservices.azure.com"
         },
         {
-            "url": "https://westus.api.cognitive.microsoft.com"
+            "url": "https://cognitiveuseprod.openai.azure.com"
         },
         {
-            "url": "https://cognitive-wu.openai.azure.com"
-        },
-        {
-            "url": "https://api.ProjectOxford.ai"
+            "url": "https://eastus.api.cognitive.microsoft.com"
         }
     ],
     "paths": {
-        "/analyze": {
+        "/imageanalysis:analyze": {
             "post": {
-                "description": "This operation extracts a rich set of visual features based on the image content. \r\n        <br>\r\n        <br>\r\n        Two input methods are supported -- (1) Uploading an image or (2) specifying an image URL.  Within your request, there is an optional parameter to allow you to choose which features to return.  By default, image categories are returned in the response. \r\n        <br>\r\n        <br>\r\n        A successful response will be returned in JSON.  If the request failed, the response will contain an error code and a message to help understand what went wrong. \r\n\r\n<h4>Http Method</h4>\r\nPOST",
-                "operationId": "56f91f2e778daf14a499e1fa",
-                "summary": "Analyze Image",
+                "description": "Analyze the input image. The request either contains image stream with any content type ['image/*', 'application/octet-stream'], or a JSON payload which includes an url property to be used to retrieve the image stream.",
+                "operationId": "61d65934cd35050c20f73ab6",
+                "summary": "Analyze",
                 "parameters": [
                     {
-                        "name": "visualFeatures",
+                        "name": "features",
                         "in": "query",
-                        "description": "A string indicating what visual feature types to return. Multiple values should be comma-separated. \n<br/>Valid visual feature types include:\n<br/>\t\n<ul>\n<li><b>Categories</b> - categorizes image content according to a taxonomy defined in documentation. </li>\n<li><b>Tags</b> - tags the image with a detailed list of words related to the image content. </li>\n<li><b>Description</b> - describes the image content with a complete English sentence. </li>\n<li><b>Faces</b> - detects if faces are present. If present, generate coordinates, gender and age.</li> \n<li><b >ImageType</b> - detects if image is clipart or a line drawing.</li>\n<li><b> Color</b> - determines the accent color, dominant color, and whether an image is black&white.</li>\n<li><b>Adult</b> - detects if the image is pornographic in nature (depicts nudity or a sex act).  Sexually suggestive content is also detected.</li>\n</ul>",
-                        "type": "string",
-                        "default": "Categories",
-                        "enum": [
-                            "ImageType",
-                            "Faces",
-                            "Adult",
-                            "Categories",
-                            "Color",
-                            "Tags",
-                            "Description"
-                        ]
+                        "description": "The visual features requested: tags, objects, caption, denseCaptions, read, smartCrops, people. This parameter needs to be specified if the parameter \"model-name\" is not specified.",
+                        "type": "array"
                     },
                     {
-                        "name": "details",
+                        "name": "model-name",
                         "in": "query",
-                        "description": "A string indicating which domain-specific details to return. Multiple values should be comma-separated. \n<br/>Valid visual feature types include:\n<br/>\t\n<ul>\n<li><b >Celebrities</b> - identifies celebrities if detected in the image.</li>\n<li><b >Landmarks</b> - identifies landmarks if detected in the image.</li>\n</ul>\n",
-                        "type": "string",
-                        "enum": [
-                            "Celebrities",
-                            "Landmarks"
-                        ]
+                        "description": "The name of the custom trained model. This parameter needs to be specified if the parameter \"features\" is not specified.",
+                        "type": "string"
                     },
                     {
                         "name": "language",
                         "in": "query",
-                        "description": "A string indicating which language to return. The service will return recognition results in specified language. If this parameter is not specified, the default value is &quot;en&quot;.<br />\nSupported languages:\n<ul>\n<li><b >en</b> - English, Default.</li>\n<li><b >zh</b> - Simplified Chinese.</li>\n</ul>",
+                        "description": "The desired language for output generation. If this parameter is not specified, the default value is \"en\". See https://aka.ms/cv-languages for a list of supported languages.",
                         "type": "string",
-                        "default": "en",
-                        "enum": [
-                            "en",
-                            "zh"
-                        ]
+                        "default": "en"
                     },
                     {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "example": "[Binary Image Data]"
-                        },
-                        "description": "Input passed within the POST body. Supported input methods: raw image binary or image URL. \r\n<br/>\r\n<br/>Input requirements: \r\n<ul>\r\n<li>Supported image formats: JPEG, PNG, GIF, BMP. </li>\r\n<li>Image file size must be less than 4MB.</li>\r\n<li>Image dimensions must be at least 50 x 50.</li>\r\n</ul>"
-                    }
-                ],
-                "consumes": [
-                    "application/json",
-                    "application/octet-stream",
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The response include the extracted features in JSON format.\r\n<p/>Here is the definitions for enumeration types\r\n<br/>\r\n<b>ClipartType</b>\r\n<ul>\r\n<li>Non-clipart = 0, </li>\r\n<li> ambiguous = 1,</li>\r\n<li> normal-clipart = 2,</li>\r\n<li> good-clipart = 3.</li>\r\n</ul>\r\n<br/><b>LineDrawingType</b>\r\n<ul>\r\n<li>Non-LineDrawing = 0,</li>\r\n<li>LineDrawing = 1.</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n  \"categories\": [\r\n    {\r\n      \"name\": \"abstract_\",\r\n      \"score\": 0.00390625\r\n    },\r\n    {\r\n      \"name\": \"people_\",\r\n      \"score\": 0.83984375,\r\n      \"detail\": {\r\n        \"celebrities\": [\r\n          {\r\n            \"name\": \"Satya Nadella\",\r\n            \"faceRectangle\": {\r\n              \"left\": 597,\r\n              \"top\": 162,\r\n              \"width\": 248,\r\n              \"height\": 248\r\n            },\r\n            \"confidence\": 0.999028444\r\n          }\r\n        ],\r\n        \"landmarks\":[\r\n          {\r\n            \"name\":\"Forbidden City\",\r\n            \"confidence\": 0.9978346\r\n          }\r\n        ]\r\n      }\r\n    }\r\n  ],\r\n  \"adult\": {\r\n    \"isAdultContent\": false,\r\n    \"isRacyContent\": false,\r\n    \"adultScore\": 0.0934349000453949,\r\n    \"racyScore\": 0.068613491952419281\r\n  },\r\n  \"tags\": [\r\n    {\r\n      \"name\": \"person\",\r\n      \"confidence\": 0.98979085683822632\r\n    },\r\n    {\r\n      \"name\": \"man\",\r\n      \"confidence\": 0.94493889808654785\r\n    },\r\n    {\r\n      \"name\": \"outdoor\",\r\n      \"confidence\": 0.938492476940155\r\n    },\r\n    {\r\n      \"name\": \"window\",\r\n      \"confidence\": 0.89513939619064331\r\n    }\r\n  ],\r\n  \"description\": {\r\n    \"tags\": [\r\n      \"person\",\r\n      \"man\",\r\n      \"outdoor\",\r\n      \"window\",\r\n      \"glasses\"\r\n    ],\r\n    \"captions\": [\r\n      {\r\n        \"text\": \"Satya Nadella sitting on a bench\",\r\n        \"confidence\": 0.48293603002174407\r\n      }\r\n    ]\r\n  },\r\n  \"requestId\": \"0dbec5ad-a3d3-4f7e-96b4-dfd57efe967d\",\r\n  \"metadata\": {\r\n    \"width\": 1500,\r\n    \"height\": 1000,\r\n    \"format\": \"Jpeg\"\r\n  },\r\n  \"faces\": [\r\n    {\r\n      \"age\": 44,\r\n      \"gender\": \"Male\",\r\n      \"faceRectangle\": {\r\n        \"left\": 593,\r\n        \"top\": 160,\r\n        \"width\": 250,\r\n        \"height\": 250\r\n      }\r\n    }\r\n  ],\r\n  \"color\": {\r\n    \"dominantColorForeground\": \"Brown\",\r\n    \"dominantColorBackground\": \"Brown\",\r\n    \"dominantColors\": [\r\n      \"Brown\",\r\n      \"Black\"\r\n    ],\r\n    \"accentColor\": \"873B59\",\r\n    \"isBWImg\": false\r\n  },\r\n  \"imageType\": {\r\n    \"clipArtType\": 0,\r\n    \"lineDrawingType\": 0\r\n  }\r\n}"
-                        }
-                    },
-                    "400": {
-                        "description": "Possible Errors: \r\n<ul>\r\n<li><b>InvalidImageUrl</b>\r\n<br/>Image URL is badly formatted or not accessible.\r\n</li>\r\n<li><b>InvalidImageFormat</b>\r\n<br/>Input data is not a valid image.</li>\r\n<li><b>InvalidImageSize</b>\r\n<br/>Input image is too large.</li>\r\n<li><b>NotSupportedVisualFeature</b>\r\n<br/>Specified feature type is not valid.</li>\r\n<li><b>NotSupportedImage</b>\r\n<br/>Unsupported image, e.g. child pornography.</li>\r\n<li><b>InvalidDetails</b>\r\n<br/>Unsupported domain-specific model.</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n        \"code\":\"InvalidImageFormat\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"The input file is not in a valid image format that the service can support. \"\r\n}\r\n"
-                        }
-                    },
-                    "415": {
-                        "description": "Unsupported media type error. Content-Type is not in the allowed types:<br/>\r\n<ul>\r\n<li>For an image URL: Content-Type should be application/json</li>\r\n<li>For a binary image data: Content-Type should be application/octet-stream or multipart/form-data</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n        \"code\":\"BadArgument\",\r\n        \"message\":\"Invalid Media Type\"\r\n}"
-                        }
-                    },
-                    "500": {
-                        "description": "Possible Errors:\r\n<ul>\r\n<li><b>FailedToProcess</b>\r\n<br/>Failed to process the image.</li>\r\n<li><b>Timeout</b>\r\n<br/>Image processing time out.</li>\r\n<li><b>InternalServerError</b>\r\n<br/>Internal server error.</li>\r\n</ul> ",
-                        "examples": {
-                            "application/json": "{\r\n        \"code\":\"FailedToProcess\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"Could not extract image features\"\r\n}"
-                        }
-                    }
-                }
-            }
-        },
-        "/describe": {
-            "post": {
-                "description": "This operation generates a description of an image in human readable language with complete sentences.  The description is based on a collection of content tags, which are also returned by the operation. More than one description can be generated for each image.  Descriptions are ordered by their confidence score. All descriptions are in English.\r\n        <br>\r\n        <br>\r\n        Two input methods are supported -- (1) Uploading an image or (2) specifying an image URL.  \r\n        <br>\r\n        <br>\r\n        A successful response will be returned in JSON.  If the request failed, the response will contain an error code and a message to help understand what went wrong. \r\n\r\n<h4>Http Method</h4>\r\nPOST",
-                "operationId": "56f91f2e778daf14a499e1fe",
-                "summary": "Describe Image",
-                "parameters": [
-                    {
-                        "name": "maxCandidates",
+                        "name": "smartcrops-aspect-ratios",
                         "in": "query",
-                        "description": "Maximum number of candidate descriptions to be returned.  The default is 1.",
-                        "type": "string",
-                        "default": "1",
-                        "enum": [
-                            "1"
-                        ]
+                        "description": "A list of aspect ratios to use for smartCrops feature. Aspect ratios are calculated by dividing the target crop width by the height. Supported values are between 0.75 and 1.8 (inclusive). Multiple values should be comma-separated. If this parameter is not specified, the service will return one crop suggestion with an aspect ratio it sees fit between 0.5 and 2.0 (inclusive).",
+                        "type": "string"
                     },
                     {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "example": "[Binary image data]"
-                        },
-                        "description": "Input passed within the POST body. Supported input methods: raw image binary or image URL. \r\n<br/>\r\n<br/>Input requirements: \r\n<ul>\r\n<li>Supported image formats: JPEG, PNG, GIF, BMP. </li>\r\n<li>Image file size must be less than 4MB.</li>\r\n<li>Image dimensions should be greater than 50 x 50.</li>\r\n</ul>"
-                    }
-                ],
-                "consumes": [
-                    "application/json",
-                    "application/octet-stream",
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "examples": {
-                            "application/json": "{\r\n  \"description\": {\r\n    \"tags\": [\r\n      \"person\",\r\n      \"man\",\r\n      \"outdoor\",\r\n      \"window\",\r\n      \"glasses\"\r\n    ],\r\n    \"captions\": [\r\n      {\r\n        \"text\": \"Satya Nadella sitting on a bench\",\r\n        \"confidence\": 0.48293603002174407\r\n      },\r\n      {\r\n        \"text\": \"Satya Nadella is sitting on a bench\",\r\n        \"confidence\": 0.40037006815422832\r\n      },\r\n      {\r\n        \"text\": \"Satya Nadella sitting in front of a building\",\r\n        \"confidence\": 0.38035155997373377\r\n      }\r\n    ]\r\n  },\r\n  \"requestId\": \"ed2de1c6-fb55-4686-b0da-4da6e05d283f\",\r\n  \"metadata\": {\r\n    \"width\": 1500,\r\n    \"height\": 1000,\r\n    \"format\": \"Jpeg\"\r\n  }\r\n}"
-                        }
-                    },
-                    "400": {
-                        "description": "Possible Errors: \r\n<ul>\r\n<li><b>InvalidImageUrl</b>\r\n<br/>Image URL is badly formatted or not accessible.\r\n</li>\r\n<li><b>InvalidImageFormat</b>\r\n<br/>Input data is not a valid image.</li>\r\n<li><b>InvalidImageSize</b>\r\n<br/>Input image is too large.</li>\r\n<li><b>NotSupportedImage</b>\r\n<br/>Unsupported image, e.g. child pornography.</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"InvalidImageFormat\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"The input file is not in a valid image format that the service can support. \"\r\n}\r\n"
-                        }
-                    },
-                    "415": {
-                        "description": "Unsupported media type error. Content-Type is not in the allowed types:<br/>\r\n<ul>\r\n<li>For an image URL: Content-Type should be application/json</li>\r\n<li>For a binary image data: Content-Type should be application/octet-stream or multipart/form-data</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"BadArgument\",\r\n    \"message\":\"Invalid Media Type\"\r\n}\r\n"
-                        }
-                    },
-                    "500": {
-                        "description": "Possible Errors:\r\n<ul>\r\n<li><b>FailedToProcess</b>\r\n<br/>Failed to process the image.</li>\r\n<li><b>Timeout</b>\r\n<br/>Image processing time out.</li>\r\n<li><b>InternalServerError</b>\r\n<br/>Internal server error.</li>\r\n</ul> ",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"FailedToProcess\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"Could not extract image features\"\r\n}\r\n"
-                        }
-                    }
-                }
-            }
-        },
-        "/generateThumbnail": {
-            "post": {
-                "description": "This operation generates a thumbnail image with the user-specified width and height.  By default, the service analyzes the image, identifies the region of interest (ROI), and generates smart cropping coordinates based on the ROI.  Smart cropping helps when you specify an aspect ratio that differs from that of the input image\r\n<p/>\r\nA successful response contains the thumbnail image binary.  If the request failed, the response contains an error code and a message to help determine what went wrong.\r\n\r\n<p/>\r\nUpon failure, the error code and an error message are returned. The error code could be one of InvalidImageUrl, InvalidImageFormat, InvalidImageSize, InvalidThumbnailSize, NotSupportedImage, FailedToProcess, Timeout, or InternalServerError.\r\n\r\n<h4>Http Method</h4>\r\nPOST\r\n",
-                "operationId": "56f91f2e778daf14a499e1fb",
-                "summary": "Get Thumbnail",
-                "parameters": [
-                    {
-                        "name": "smartCropping",
+                        "name": "gender-neutral-caption",
                         "in": "query",
-                        "description": "Boolean flag for enabling smart cropping.",
+                        "description": "Boolean flag for enabling gender-neutral captioning for caption and denseCaptions features. If this parameter is not specified, the default value is \"false\".",
                         "type": "boolean",
-                        "default": true,
-                        "enum": [
-                            true
-                        ]
+                        "default": false
                     },
                     {
-                        "name": "width",
-                        "in": "query",
-                        "description": "Width of the thumbnail.  It must be between 1 and 1024. Recommended minimum of 50.",
-                        "required": true,
-                        "type": "number"
-                    },
-                    {
-                        "name": "height",
-                        "in": "query",
-                        "description": "Height of the thumbnail. It must be between 1 and 1024. Recommended minimum of 50.",
-                        "required": true,
-                        "type": "number"
-                    },
-                    {
-                        "name": "body",
+                        "name": "imageUrl",
                         "in": "body",
                         "schema": {
-                            "example": "[Binary image data]"
+                            "$ref": "#/definitions/ImageUrl"
                         },
-                        "description": "Input passed within the POST body. Supported input methods: raw image binary or image URL. \r\n<br/>\r\n<br/>Input requirements: \r\n<ul>\r\n<li>Supported image formats: JPEG, PNG, GIF, BMP. </li>\r\n<li>Image file size must be less than 4MB.</li>\r\n<li>Image dimensions should be greater than 50 x 50.</li>\r\n</ul>"
+                        "description": "A JSON document with a URL pointing to the image that is to be analyzed."
                     }
                 ],
                 "consumes": [
-                    "application/json",
-                    "application/octet-stream",
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
-                    "image/jpeg",
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Return thumbnail image.",
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/ImageAnalysisResult"
+                        },
                         "examples": {
-                            "image/jpeg": "[Binary image data]"
-                        }
-                    },
-                    "400": {
-                        "description": "Possible Errors: \r\n<ul>\r\n<li><b>InvalidImageUrl</b>\r\n<br/>Image URL is badly formatted or not accessible.\r\n</li>\r\n<li><b>InvalidImageFormat</b>\r\n<br/>Input data is not a valid image.</li>\r\n<li><b>InvalidImageSize</b>\r\n<br/>Input image is too large.</li>\r\n<li><b>InvalidThumbnailSize</b>\r\n<br/>Specified thumbnail size is not in allowed range.</li>\r\n</ul>",
-                        "examples": {
-                            "image/jpeg": "{\r\n    \"code\":\"InvalidImageFormat\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"The input file is not in a valid image format that the service can support. \"\r\n}"
-                        }
-                    },
-                    "415": {
-                        "description": "Unsupported media type error. Content-Type is not in the allowed types:<br/>\r\n<ul>\r\n<li>For an image URL: Content-Type should be application/json</li>\r\n<li>For a binary image data: Content-Type should be application/octet-stream or multipart/form-data</li>\r\n</ul>\r\n",
-                        "examples": {
-                            "image/jpeg": "{\r\n    \"code\":\"BadArgument\",\r\n    \"message\":\"Invalid Media Type\"\r\n}"
+                            "application/json": "{\r\n  \"customModelResult\": {\r\n    \"tagsResult\": {\r\n      \"values\": [\r\n        {\r\n          \"name\": \"string\",\r\n          \"confidence\": 0.0\r\n        }\r\n      ]\r\n    },\r\n    \"objectsResult\": {\r\n      \"values\": [\r\n        {\r\n          \"id\": \"string\",\r\n          \"boundingBox\": {\r\n            \"x\": 0,\r\n            \"y\": 0,\r\n            \"w\": 0,\r\n            \"h\": 0\r\n          },\r\n          \"tags\": [\r\n            {\r\n              \"name\": \"string\",\r\n              \"confidence\": 0.0\r\n            }\r\n          ]\r\n        }\r\n      ]\r\n    }\r\n  },\r\n  \"captionResult\": {\r\n    \"text\": \"string\",\r\n    \"confidence\": 0.0\r\n  },\r\n  \"objectsResult\": {\r\n    \"values\": [\r\n      {\r\n        \"id\": \"string\",\r\n        \"boundingBox\": {\r\n          \"x\": 0,\r\n          \"y\": 0,\r\n          \"w\": 0,\r\n          \"h\": 0\r\n        },\r\n        \"tags\": [\r\n          {\r\n            \"name\": \"string\",\r\n            \"confidence\": 0.0\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  },\r\n  \"readResult\": {\r\n    \"stringIndexType\": \"string\",\r\n    \"content\": \"string\",\r\n    \"pages\": [\r\n      {\r\n        \"height\": 0.0,\r\n        \"width\": 0.0,\r\n        \"angle\": 0.0,\r\n        \"pageNumber\": 0,\r\n        \"words\": [\r\n          {\r\n            \"content\": \"string\",\r\n            \"boundingBox\": [\r\n              0.0\r\n            ],\r\n            \"confidence\": 0.0,\r\n            \"span\": {\r\n              \"offset\": 0,\r\n              \"length\": 0\r\n            }\r\n          }\r\n        ],\r\n        \"spans\": [\r\n          {\r\n            \"offset\": 0,\r\n            \"length\": 0\r\n          }\r\n        ],\r\n        \"lines\": [\r\n          {\r\n            \"content\": \"string\",\r\n            \"boundingBox\": [\r\n              0.0\r\n            ],\r\n            \"spans\": [\r\n              {\r\n                \"offset\": 0,\r\n                \"length\": 0\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      }\r\n    ],\r\n    \"styles\": [\r\n      {\r\n        \"isHandwritten\": true,\r\n        \"spans\": [\r\n          {\r\n            \"offset\": 0,\r\n            \"length\": 0\r\n          }\r\n        ],\r\n        \"confidence\": 0.0\r\n      }\r\n    ]\r\n  },\r\n  \"denseCaptionsResult\": {\r\n    \"values\": [\r\n      {\r\n        \"text\": \"string\",\r\n        \"confidence\": 0.0,\r\n        \"boundingBox\": {\r\n          \"x\": 0,\r\n          \"y\": 0,\r\n          \"w\": 0,\r\n          \"h\": 0\r\n        }\r\n      }\r\n    ]\r\n  },\r\n  \"modelVersion\": \"string\",\r\n  \"metadata\": {\r\n    \"width\": 0,\r\n    \"height\": 0\r\n  },\r\n  \"tagsResult\": {\r\n    \"values\": [\r\n      {\r\n        \"name\": \"string\",\r\n        \"confidence\": 0.0\r\n      }\r\n    ]\r\n  },\r\n  \"adultResult\": {\r\n    \"adult\": {\r\n      \"isMatch\": true,\r\n      \"confidence\": 0.0\r\n    },\r\n    \"racy\": {\r\n      \"isMatch\": true,\r\n      \"confidence\": 0.0\r\n    },\r\n    \"gore\": {\r\n      \"isMatch\": true,\r\n      \"confidence\": 0.0\r\n    }\r\n  },\r\n  \"smartCropsResult\": {\r\n    \"values\": [\r\n      {\r\n        \"aspectRatio\": 0.0,\r\n        \"boundingBox\": {\r\n          \"x\": 0,\r\n          \"y\": 0,\r\n          \"w\": 0,\r\n          \"h\": 0\r\n        }\r\n      }\r\n    ]\r\n  },\r\n  \"peopleResult\": {\r\n    \"values\": [\r\n      {\r\n        \"boundingBox\": {\r\n          \"x\": 0,\r\n          \"y\": 0,\r\n          \"w\": 0,\r\n          \"h\": 0\r\n        },\r\n        \"confidence\": 0.0\r\n      }\r\n    ]\r\n  }\r\n}"
                         }
                     },
                     "500": {
-                        "description": "Possible Errors:\r\n<ul>\r\n<li><b>FailedToProcess</b>\r\n<br/>Failed to process the image.</li>\r\n<li><b>Timeout</b>\r\n<br/>Image processing time out.</li>\r\n<li><b>InternalServerError</b>\r\n<br/>Internal server error.</li>\r\n</ul> ",
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/datasets/{name}": {
+            "get": {
+                "description": "Get information about a specific dataset.\r\n            \r\nStatus codes returned:\r\n- 200: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A dataset with the specified name was not found.",
+                "operationId": "63c227a15ddd17166ce42740",
+                "summary": "GetDataset",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "The name of the dataset to get.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Dataset"
+                        },
                         "examples": {
-                            "image/jpeg": "{\r\n    \"code\":\"FailedToProcess\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"Could not extract image features\"\r\n}"
+                            "application/json": "{\r\n  \"annotationKind\": \"imageClassification\",\r\n  \"annotationFileUris\": [\r\n    \"string\"\r\n  ],\r\n  \"customProperties\": {},\r\n  \"name\": \"string\",\r\n  \"createdDateTime\": \"string\",\r\n  \"updatedDateTime\": \"string\",\r\n  \"eTag\": \"string\",\r\n  \"authentication\": {\r\n    \"kind\": \"none\",\r\n    \"sasToken\": \"string\"\r\n  }\r\n}"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Register a new dataset.\r\n            \r\nStatus codes returned:\r\n- 201: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 409: A dataset with the specified name already exists.",
+                "operationId": "63c227a15ddd17166ce4273f",
+                "summary": "RegisterDataset",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "A name that can be used to uniquely identify the dataset after it has been registered.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "dataset",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Dataset"
+                        },
+                        "description": "Properties for the dataset, such as the list of URIs to the annotation files."
+                    }
+                ],
+                "consumes": [
+                    "application/json-patch+json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/Dataset"
+                        },
+                        "examples": {
+                            "application/json": "{\r\n  \"annotationKind\": \"imageClassification\",\r\n  \"annotationFileUris\": [\r\n    \"string\"\r\n  ],\r\n  \"customProperties\": {},\r\n  \"name\": \"string\",\r\n  \"createdDateTime\": \"string\",\r\n  \"updatedDateTime\": \"string\",\r\n  \"eTag\": \"string\",\r\n  \"authentication\": {\r\n    \"kind\": \"none\",\r\n    \"sasToken\": \"string\"\r\n  }\r\n}"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Unregister a dataset.\r\n            \r\nStatus codes returned:\r\n- 204: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A dataset with the specified name was not found.\r\n- 412: An If-Match header was provided, but the given ETag did not match the current ETag value.",
+                "operationId": "63c227a15ddd17166ce42742",
+                "summary": "UnregisterDataset",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "The name of the dataset to unregister.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "Optional ETag for the dataset to unregister.<br />\r\nIf an ETag is provided, then the dataset will be unregistered only if its current ETag value matches the given ETag.\r\nIf the ETag values don't match, then the unregister operation will fail with status code 412 (Precondition Failed).\r\nThis indicates that the dataset has been updated since the last time information for the dataset was obtained.<br />\r\nIf an ETag is not provided or its value is '*', then the dataset will always be unregistered regardless of the current ETag value.",
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update the properties of an existing dataset.\r\n            \r\nStatus codes returned:\r\n- 200: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A dataset with the specified name was not found.\r\n- 412: An If-Match header was provided, but the given ETag did not match the current ETag value.",
+                "operationId": "63c227a15ddd17166ce42741",
+                "summary": "UpdateDataset",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "The name of the dataset to update.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "Optional ETag for the dataset to update.<br />\r\nIf an ETag is provided, then the dataset will be updated only if its current ETag value matches the given ETag.\r\nIf the ETag values don't match, then the update operation will fail with status code 412 (Precondition Failed).\r\nThis indicates that the dataset has been updated since the last time information for the dataset was obtained.<br />\r\nIf an ETag is not provided or its value is '*', then the dataset will always be updated regardless of the current ETag value.",
+                        "type": "string"
+                    },
+                    {
+                        "name": "dataset",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Dataset"
+                        },
+                        "description": "Properties to update on the existing dataset."
+                    }
+                ],
+                "consumes": [
+                    "application/json-patch+json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Dataset"
+                        },
+                        "examples": {
+                            "application/json": "{\r\n  \"annotationKind\": \"imageClassification\",\r\n  \"annotationFileUris\": [\r\n    \"string\"\r\n  ],\r\n  \"customProperties\": {},\r\n  \"name\": \"string\",\r\n  \"createdDateTime\": \"string\",\r\n  \"updatedDateTime\": \"string\",\r\n  \"eTag\": \"string\",\r\n  \"authentication\": {\r\n    \"kind\": \"none\",\r\n    \"sasToken\": \"string\"\r\n  }\r\n}"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/datasets": {
+            "get": {
+                "description": "Get a list of datasets that have been registered.\r\n            \r\nStatus codes returned:\r\n- 200: Operation completed successfully.\r\n- 400: The request was malformed.",
+                "operationId": "63c227a15ddd17166ce42743",
+                "summary": "GetDatasets",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Format - int32. Number of datasets to be skipped.",
+                        "type": "integer",
+                        "default": 0
+                    },
+                    {
+                        "name": "top",
+                        "in": "query",
+                        "description": "Format - int32. Number of datasets to be returned after skipping. The maximum allowed value is 30.",
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/DatasetApiModelCollectionApiModel"
+                        },
+                        "examples": {
+                            "application/json": "{\r\n  \"value\": [\r\n    {\r\n      \"annotationKind\": \"imageClassification\",\r\n      \"annotationFileUris\": [\r\n        \"string\"\r\n      ],\r\n      \"customProperties\": {},\r\n      \"name\": \"string\",\r\n      \"createdDateTime\": \"string\",\r\n      \"updatedDateTime\": \"string\",\r\n      \"eTag\": \"string\",\r\n      \"authentication\": {\r\n        \"kind\": \"none\",\r\n        \"sasToken\": \"string\"\r\n      }\r\n    }\r\n  ],\r\n  \"nextLink\": \"string\"\r\n}"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/imagecomposition:rectify": {
+            "post": {
+                "description": "Run the image rectification operation against an image with 4 control points provided in the parameter.",
+                "operationId": "644aba14fb42681ae06f1b09",
+                "summary": "ImageComposition_Rectify",
+                "parameters": [
+                    {
+                        "name": "imageRectificationRequestApiModel",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/ImageRectificationRequestApiModel"
+                        },
+                        "description": "Input image url and control points that are passed into rectification operation."
+                    }
+                ],
+                "consumes": [
+                    "application/json-patch+json"
+                ],
+                "produces": [
+                    "image/jpeg"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Imagecomposition-rectifyPost200ImageJpegResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/imagecomposition:stitch": {
+            "post": {
+                "description": "Run the image stitching operation against a sequence of images.",
+                "operationId": "644aba14fb42681ae06f1b08",
+                "summary": "ImageComposition_Stitch",
+                "parameters": [
+                    {
+                        "name": "imageStitchingRequestApiModel",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/ImageStitchingRequestApiModel"
+                        },
+                        "description": "Input images urls that pass into image stitching operation."
+                    }
+                ],
+                "consumes": [
+                    "application/json-patch+json"
+                ],
+                "produces": [
+                    "image/jpeg"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Imagecomposition-stitchPost200ImageJpegResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/models/{modelName}/evaluations/{evaluationName}": {
+            "put": {
+                "description": "Evaluate an existing model.\r\n            \r\nStatus codes returned:\r\n- 201: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 409: An evaluation with the specified name already exists.",
+                "operationId": "63c227a15ddd17166ce42749",
+                "summary": "EvaluateModel",
+                "parameters": [
+                    {
+                        "name": "modelName",
+                        "in": "path",
+                        "description": "The name of the model to evaluate.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "evaluationName",
+                        "in": "path",
+                        "description": "A name that can be used to uniquely identify the evaluation after it has been created.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "modelEvaluation",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/ModelEvaluation"
+                        },
+                        "description": "Properties for the evaluation, such as the name of the dataset to use to test the model."
+                    }
+                ],
+                "consumes": [
+                    "application/json-patch+json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ModelEvaluation"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a model evaluation. A model evaluation can be deleted if it is in the 'Succeeded' or 'Failed' states.\r\n            \r\nStatus codes returned:\r\n- 204: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A model evaluation with the specified name was not found.",
+                "operationId": "63c227a15ddd17166ce4274b",
+                "summary": "DeleteModelEvaluation",
+                "parameters": [
+                    {
+                        "name": "modelName",
+                        "in": "path",
+                        "description": "The name of the model to delete the evaluation for.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "evaluationName",
+                        "in": "path",
+                        "description": "The name of the model evaluation to delete.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "description": "Get information about a specific model evaluation.\r\n            \r\nStatus codes returned:\r\n- 200: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A model  evaluation with the specified name was not found.",
+                "operationId": "63c227a15ddd17166ce4274a",
+                "summary": "GetModelEvaluation",
+                "parameters": [
+                    {
+                        "name": "modelName",
+                        "in": "path",
+                        "description": "The name of the model to get the evaluation for.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "evaluationName",
+                        "in": "path",
+                        "description": "The name of the model evaluation to get.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/ModelEvaluation"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/models/{modelName}/evaluations": {
+            "get": {
+                "description": "Get a list of the available evaluations for a model.\r\n            \r\nStatus codes returned:\r\n- 200: Operation completed successfully.\r\n- 400: The request was malformed.",
+                "operationId": "63c227a15ddd17166ce4274c",
+                "summary": "GetModelEvaluations",
+                "parameters": [
+                    {
+                        "name": "modelName",
+                        "in": "path",
+                        "description": "The name of the model to get evaluations for.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Format - int32. Number of evaluations to be skipped.",
+                        "type": "integer",
+                        "default": 0
+                    },
+                    {
+                        "name": "top",
+                        "in": "query",
+                        "description": "Format - int32. Number of evaluations to be returned after skipping. The maximum allowed value is 30.",
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/ModelEvaluationApiModelCollectionApiModel"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/models/{name}:cancel": {
+            "post": {
+                "description": "Cancel model training.\r\n            \r\nStatus codes returned:\r\n- 202: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A model with the specified name was not found.",
+                "operationId": "63c227a15ddd17166ce42748",
+                "summary": "CancelModelTraining",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "The name of the model to cancel training.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/models/{name}": {
+            "put": {
+                "description": "Start training a custom model.\r\n            \r\nStatus codes returned:\r\n- 201: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 409: A model with the specified name already exists.",
+                "operationId": "63c227a15ddd17166ce42744",
+                "summary": "TrainModel",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "A name that can be used to uniquely identify the model after it has been created.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "model",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Model"
+                        },
+                        "description": "Properties for the model, such as the name of the dataset to use to train the model."
+                    }
+                ],
+                "consumes": [
+                    "application/json-patch+json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/Model"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a custom model. A model can be deleted if it is in one of the 'Succeeded', 'Failed', or 'Canceled' states.\r\nIf a model is in the 'NotStarted' or 'Training' state, cancel training and wait for cancellation to finish before deleting the model.\r\n            \r\nStatus codes returned:\r\n- 204: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A model with the specified name was not found.",
+                "operationId": "63c227a15ddd17166ce42746",
+                "summary": "DeleteModel",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "The name of the model to delete.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "description": "Get information about a specific model.\r\n            \r\nStatus codes returned:\r\n- 200: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A model with the specified name was not found.",
+                "operationId": "63c227a15ddd17166ce42745",
+                "summary": "GetModel",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "The name of the model to get.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Model"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -272,344 +783,2476 @@
         },
         "/models": {
             "get": {
-                "description": "This operation returns the list of domain-specific models that are supported by the Computer Vision API.  Currently, the API supports following domain-specific models: celebrity recognizer, landmark recognizer.\r\n        <br>\r\n        <br>\r\n        A successful response will be returned in JSON.  If the request failed, the response will contain an error code and a message to help understand what went wrong. \r\n\r\n<h4>Http Method</h4>\r\nGET",
-                "operationId": "56f91f2e778daf14a499e1fd",
-                "summary": "List Domain Specific Models",
+                "description": "Get a list of the available models.\r\n            \r\nStatus codes returned:\r\n- 200: Operation completed successfully.\r\n- 400: The request was malformed.",
+                "operationId": "63c227a15ddd17166ce42747",
+                "summary": "GetModels",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Format - int32. Number of models to be skipped.",
+                        "type": "integer",
+                        "default": 0
+                    },
+                    {
+                        "name": "top",
+                        "in": "query",
+                        "description": "Format - int32. Number of models to be returned after skipping. The maximum allowed value is 30.",
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
-                        "examples": {
-                            "application/json": "{\r\n  \"models\": [\r\n    {\r\n      \"name\": \"celebrities\",\r\n      \"categories\": [\r\n        \"people_\"\r\n      ]\r\n    },\r\n    {\r\n      \"name\": \"landmarks\",\r\n      \"categories\": [\r\n        \"building_\"\r\n      ]\r\n    }\r\n  ]\r\n}"
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/ModelApiModelCollectionApiModel"
                         }
                     },
                     "500": {
-                        "description": "Possible Errors:\r\n<ul>\r\n<li><b>Timeout</b>\r\n<br/>Request timed out.</li>\r\n<li><b>InternalServerError</b>\r\n<br/>Internal server error.</li>\r\n</ul> \r\n",
-                        "examples": {
-                            "application/json": "{\r\n        \"code\":\"InternalServerError\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"Internal server error\"\r\n}"
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/ocr": {
+        "/planogramcompliance:match": {
             "post": {
-                "description": "Optical Character Recognition (OCR) detects text in an image and extracts the recognized characters into a machine-usable character stream.   \r\n\r\n<p/>\r\nUpon success, the OCR results will be returned. \r\n<p/>\r\nUpon failure, the error code together with an error message will be returned. The error code can be one of InvalidImageUrl, InvalidImageFormat, InvalidImageSize, NotSupportedImage,  NotSupportedLanguage, or InternalServerError.\r\n\r\n<h4>Http Method</h4>\r\nPOST",
-                "operationId": "56f91f2e778daf14a499e1fc",
-                "summary": "OCR",
+                "description": "Run the planogram matching operation against a planogram and a product understanding result.",
+                "operationId": "644aba14fb42681ae06f1b0a",
+                "summary": "PlanogramCompliance_Match",
                 "parameters": [
                     {
-                        "name": "language",
-                        "in": "query",
-                        "description": "The BCP-47 language code of the text to be detected in the image.The default value is &quot;unk&quot;, then the service will auto detect the language of the text in the image.<br />\n    <br />\n    Supported languages:\n    <ul style=\"margin-left:.375in;direction:ltr;unicode-bidi:embed;\n margin-top:0in;margin-bottom:0in\" type=\"disc\">\n        <li>unk (AutoDetect)</li>\n        <li>zh-Hans (ChineseSimplified)</li>\n        <li>zh-Hant (ChineseTraditional)</li>\n        <li>cs (Czech)</li>\n        <li>da (Danish)</li>\n        <li>nl (Dutch)</li>\n        <li>en (English)</li>\n        <li>fi (Finnish)</li>\n        <li>fr (French)</li>\n        <li>de (German)</li>\n        <li>el (Greek)</li>\n        <li>hu (Hungarian)</li>\n        <li>it (Italian)</li>\n        <li>ja (Japanese)</li>\n        <li>ko (Korean)</li>\n        <li>nb (Norwegian)</li>\n        <li>pl (Polish)</li>\n        <li>pt (Portuguese,</li>\n        <li>ru (Russian)</li>\n        <li>es (Spanish)</li>\n        <li>sv (Swedish)</li>\n        <li>tr (Turkish)</li>\n        <li>ar (Arabic)</li>\n        <li>ro (Romanian)</li>\n        <li>sr-Cyrl (SerbianCyrillic)</li>\n        <li>sr-Latn (SerbianLatin)</li>\n        <li>sk (Slovak)</li>\n</ul>",
-                        "type": "string",
-                        "default": "unk",
-                        "enum": [
-                            "unk",
-                            "zh-Hans",
-                            " zh-Hant",
-                            "cs",
-                            "da",
-                            "nl",
-                            "en",
-                            "fi",
-                            "fr",
-                            "de",
-                            "el",
-                            "hu",
-                            "it",
-                            "ja",
-                            "ko",
-                            "nb",
-                            "pl",
-                            "pt",
-                            "ru",
-                            "es",
-                            "sv",
-                            "tr",
-                            "ar",
-                            "ro",
-                            "sr-Cyrl",
-                            "sr-Latn",
-                            "sk"
-                        ]
-                    },
-                    {
-                        "name": "detectOrientation ",
-                        "in": "query",
-                        "description": "Whether detect the text orientation in the image. With detectOrientation=true the OCR service tries to detect the image orientation and correct it before further processing (e.g. if it's upside-down). ",
-                        "type": "boolean",
-                        "default": true,
-                        "enum": [
-                            true,
-                            false
-                        ]
-                    },
-                    {
-                        "name": "body",
+                        "name": "planogramMatchingRequestApiModel",
                         "in": "body",
                         "schema": {
-                            "example": "[Binary image data]"
+                            "$ref": "#/definitions/PlanogramMatchingRequestApiModel"
                         },
-                        "description": "Input passed within the POST body. Supported input methods: raw image binary or image URL. \r\n<br/>\r\n<br/>Input requirements: \r\n<ul>\r\n<li>Supported image formats: JPEG, PNG, GIF, BMP. </li>\r\n<li>Image file size must be less than 4MB.</li>\r\n<li>Image dimensions must be between 50 x 50 and 4200 x 4200 pixels, and the image cannot be larger than 10 megapixels.</li>\r\n</ul>\r\n"
+                        "description": "Input to pass into the planogram matching operation."
                     }
                 ],
                 "consumes": [
-                    "application/json",
-                    "application/octet-stream",
-                    "multipart/form-data"
+                    "application/json-patch+json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "The OCR results in the hierarchy of region/line/word. The results include text, bounding box for regions, lines and words.\r\n<p/>\r\n<b>textAngle</b><br/>\r\nThe angle, in radians, of the detected text with respect to the closest horizontal or vertical direction. After rotating the input image clockwise by this angle, the recognized text lines become horizontal or vertical. In combination with the <b>orientation</b> property it can be used to overlay recognition results correctly on the original image, by rotating either the original image or recognition results by a suitable angle around the center of the original image. If the angle cannot be confidently detected, this property is not present. If the image contains text at different angles, only part of the text will be recognized correctly.\r\n<img src=\"https://oxfordportal.blob.core.windows.net/vision/doc-vision-overview-ocr01.png\"/>\r\n<p/><b>orientation</b><br/>\r\nOrientation of the text recognized in the image. The value (<b>up</b>,<b>down</b>,<b>left</b>, or <b>right</b>) refers to the direction that the top of the recognized text is facing, after the image has been rotated around its center according to the detected text angle (see <b>textAngle</b> property).\r\n\r\n<p/><b>language</b><br/>\r\nThe BCP-47 language code (user-provided or auto-detected) of the text detected in the image.\r\n\r\n<p/><b>regions</b><br/>\r\nAn array of objects, where each object represents a region of recognized text. A region consists of multiple lines (e.g. a column of text in a multi-column document).\r\n\r\n<p/><b>lines</b><br/>\r\nAn array of objects, where each object represents a line of recognized text.\r\n\r\n<p/><b>words</b><br/>\r\nAn array of objects, where each object represents a recognized word.\r\n\r\n<p/><b>boundingBox</b><br/>\r\nBounding box of a recognized region, line, or word, depending on the parent object. The four integers represent the x-coordinate of the left edge, the y-coordinate of the top edge, width, and height of the bounding box, in the coordinate system of the input image, after it has been rotated around its center according to the detected text angle (see <b>textAngle</b> property), with the origin at the top-left corner, and the y-axis pointing down.\r\n\r\n<p/><b>text</b><br/>\r\nString value of a recognized word.\r\n",
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/PlanogramMatchingResultApiModel"
+                        },
                         "examples": {
-                            "application/json": "{\r\n  \"language\": \"en\",\r\n  \"textAngle\": -2.0000000000000338,\r\n  \"orientation\": \"Up\",\r\n  \"regions\": [\r\n    {\r\n      \"boundingBox\": \"462,379,497,258\",\r\n      \"lines\": [\r\n        {\r\n          \"boundingBox\": \"462,379,497,74\",\r\n          \"words\": [\r\n            {\r\n              \"boundingBox\": \"462,379,41,73\",\r\n              \"text\": \"A\"\r\n            },\r\n            {\r\n              \"boundingBox\": \"523,379,153,73\",\r\n              \"text\": \"GOAL\"\r\n            },\r\n            {\r\n              \"boundingBox\": \"694,379,265,74\",\r\n              \"text\": \"WITHOUT\"\r\n            }\r\n          ]\r\n        },\r\n        {\r\n          \"boundingBox\": \"565,471,289,74\",\r\n          \"words\": [\r\n            {\r\n              \"boundingBox\": \"565,471,41,73\",\r\n              \"text\": \"A\"\r\n            },\r\n            {\r\n              \"boundingBox\": \"626,471,150,73\",\r\n              \"text\": \"PLAN\"\r\n            },\r\n            {\r\n              \"boundingBox\": \"801,472,53,73\",\r\n              \"text\": \"IS\"\r\n            }\r\n          ]\r\n        },\r\n        {\r\n          \"boundingBox\": \"519,563,375,74\",\r\n          \"words\": [\r\n            {\r\n              \"boundingBox\": \"519,563,149,74\",\r\n              \"text\": \"JUST\"\r\n            },\r\n            {\r\n              \"boundingBox\": \"683,564,41,72\",\r\n              \"text\": \"A\"\r\n            },\r\n            {\r\n              \"boundingBox\": \"741,564,153,73\",\r\n              \"text\": \"WISH\"\r\n            }\r\n          ]\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}"
-                        }
-                    },
-                    "400": {
-                        "description": "Possible Errors: \r\n<ul>\r\n<li><b>InvalidImageUrl</b>\r\n<br/>Image URL is badly formatted or not accessible.\r\n</li>\r\n<li><b>InvalidImageFormat</b>\r\n<br/>Input data is not a valid image.</li>\r\n<li><b>InvalidImageSize</b>\r\n<br/>Input image is too large.</li>\r\n<li><b>NotSupportedLanguage</b>\r\n<br/>Specified language is not supported.</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n        \"code\":\"InvalidImageFormat\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"The input file is not in a valid image format that the service can support. \"\r\n}\r\n"
-                        }
-                    },
-                    "415": {
-                        "description": "Unsupported media type error. Content-Type is not in the allowed types:<br/>\r\n<ul>\r\n<li>For an image URL: Content-Type should be application/json</li>\r\n<li>For a binary image data: Content-Type should be application/octet-stream or multipart/form-data</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"BadArgument\",\r\n    \"message\":\"Invalid Media Type\"\r\n}"
+                            "application/json": "{\r\n  \"matchingResultPerPosition\": [\r\n    {\r\n      \"positionId\": \"string\",\r\n      \"detectedObject\": {\r\n        \"id\": \"string\",\r\n        \"boundingBox\": {\r\n          \"x\": 0,\r\n          \"y\": 0,\r\n          \"w\": 0,\r\n          \"h\": 0\r\n        },\r\n        \"tags\": [\r\n          {\r\n            \"name\": \"string\",\r\n            \"confidence\": 0.0\r\n          }\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}"
                         }
                     },
                     "500": {
-                        "description": "Possible Errors:\r\n<ul>\r\n<li><b>FailedToProcess</b>\r\n<br/>Failed to process the image.</li>\r\n<li><b>Timeout</b>\r\n<br/>Image processing time out.</li>\r\n<li><b>InternalServerError</b>\r\n<br/>Internal server error.</li>\r\n</ul> ",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"FailedToProcess\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"Could not extract image features\"\r\n}"
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/models/{model}/analyze": {
-            "post": {
-                "description": "This operation recognizes content within an image by applying a domain-specific model.  The list of domain-specific models that are supported by the Computer Vision API can be retrieved using the /models GET request.  Currently, the API provides following domain-specific models: celebrities, landmarks.\r\n        <br>\r\n        <br>\r\n        Two input methods are supported -- (1) Uploading an image or (2) specifying an image URL.  \r\n        <br>\r\n        <br>\r\n        A successful response will be returned in JSON.  If the request failed, the response will contain an error code and a message to help understand what went wrong. \r\n\r\n<h4>Http Method</h4>\r\nPOST",
-                "operationId": "56f91f2e778daf14a499e200",
-                "summary": "Recognize Domain Specific Content",
+        "/productrecognition/{modelName}/runs/{runName}": {
+            "put": {
+                "description": "Run the product recognition against a model with an image.",
+                "operationId": "644aba14fb42681ae06f1b0b",
+                "summary": "ProductRecognition_Create",
                 "parameters": [
                     {
-                        "name": "model",
+                        "name": "modelName",
                         "in": "path",
-                        "description": "The domain-specific content to recognize.",
+                        "description": "The name of the model to run product recognition with.",
                         "required": true,
                         "type": "string"
                     },
                     {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "example": "[Binary image data]"
-                        },
-                        "description": "Input passed within the POST body. Supported input methods: raw image binary or image URL. \r\n<br/>\r\n<br/>Input requirements: \r\n<ul>\r\n<li>Supported image formats: JPEG, PNG, GIF, BMP. </li>\r\n<li>Image file size must be less than 4MB.</li>\r\n<li>Image dimensions should be greater than 50 x 50.</li>\r\n</ul>"
+                        "name": "runName",
+                        "in": "path",
+                        "description": "The name of the product recognition run.",
+                        "required": true,
+                        "type": "string"
                     }
-                ],
-                "consumes": [
-                    "application/json",
-                    "application/octet-stream",
-                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
-                    "200": {
-                        "description": "",
-                        "examples": {
-                            "application/json": "{\r\n  \"requestId\": \"f0027b4b-dc0d-4082-9228-1545ed246b03\",\r\n  \"metadata\": {\r\n    \"width\": 1500,\r\n    \"height\": 1000,\r\n    \"format\": \"Jpeg\"\r\n  },\r\n  \"result\": {\r\n    \"celebrities\": [\r\n      {\r\n        \"name\": \"Satya Nadella\",\r\n        \"faceRectangle\": {\r\n          \"left\": 597,\r\n          \"top\": 162,\r\n          \"width\": 248,\r\n          \"height\": 248\r\n        },\r\n        \"confidence\": 0.999028444\r\n      }\r\n    ]\r\n  }\r\n}"
-                        }
-                    },
-                    "400": {
-                        "description": "Possible Errors: \r\n<ul>\r\n<li><b>InvalidImageUrl</b>\r\n<br/>Image URL is badly formatted or not accessible.\r\n</li>\r\n<li><b>InvalidImageFormat</b>\r\n<br/>Input data is not a valid image.</li>\r\n<li><b>InvalidImageSize</b>\r\n<br/>Input image is too large.</li>\r\n<li><b>NotSupportedImage</b>\r\n<br/>Unsupported image, e.g. child pornography.</li>\r\n<li><b>BadArgument</b>\r\n<br/>Unsupported domain-specific model.</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"InvalidImageFormat\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"The input file is not in a valid image format that the service can support. \"\r\n}"
-                        }
-                    },
-                    "415": {
-                        "description": "Unsupported media type error. Content-Type is not in the allowed types:<br/>\r\n<ul>\r\n<li>For an image URL: Content-Type should be application/json</li>\r\n<li>For a binary image data: Content-Type should be application/octet-stream or multipart/form-data</li>\r\n</ul>\r\n",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"BadArgument\",\r\n    \"message\":\"Invalid Media Type\"\r\n}"
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ProductRecognitionApiModel"
                         }
                     },
                     "500": {
-                        "description": "Possible Errors:\r\n<ul>\r\n<li><b>FailedToProcess</b>\r\n<br/>Failed to process the image.</li>\r\n<li><b>Timeout</b>\r\n<br/>Image processing time out.</li>\r\n<li><b>InternalServerError</b>\r\n<br/>Internal server error.</li>\r\n</ul> ",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"FailedToProcess\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"Could not extract image features\"\r\n}"
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
-            }
-        },
-        "/tag": {
-            "post": {
-                "description": "This operation generates a list of words, or tags, that are relevant to the content of the supplied image. The Computer Vision API can return tags based on objects, living beings, scenery or actions found in images. Unlike categories, tags are not organized according to a hierarchical classification system, but correspond to image content. Tags may contain hints to avoid ambiguity or provide context, for example the tag “cello” may be accompanied by the hint “musical instrument”. All tags are in English.\r\n        <br>\r\n        <br>\r\n        Two input methods are supported -- (1) Uploading an image or (2) specifying an image URL.  \r\n        <br>\r\n        <br>\r\n        A successful response will be returned in JSON.  If the request failed, the response will contain an error code and a message to help understand what went wrong. \r\n\r\n<h4>Http Method</h4>\r\nPOST",
-                "operationId": "56f91f2e778daf14a499e1ff",
-                "summary": "Tag Image",
+            },
+            "delete": {
+                "description": "Delete a product recognition run. A product recognition run can be deleted if it is in the 'Succeeded' or 'Failed' states.\r\n            \r\nStatus codes returned:\r\n- 204: Operation completed successfully.\r\n- 400: The request was malformed.\r\n- 404: A product recognition run with the specified name was not found.",
+                "operationId": "644aba14fb42681ae06f1b0d",
+                "summary": "ProductRecognition_Delete",
                 "parameters": [
                     {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "example": "[Binary image data]"
-                        },
-                        "description": "Input passed within the POST body. Supported input methods: raw image binary or image URL. \r\n<br/>\r\n<br/>Input requirements: \r\n<ul>\r\n<li>Supported image formats: JPEG, PNG, GIF, BMP. </li>\r\n<li>Image file size must be less than 4MB.</li>\r\n<li>Image dimensions should be greater than 50 x 50.</li>\r\n</ul>"
+                        "name": "modelName",
+                        "in": "path",
+                        "description": "The name of the model to delete the product recognition run for.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "runName",
+                        "in": "path",
+                        "description": "The name of the product recognition run.",
+                        "required": true,
+                        "type": "string"
                     }
-                ],
-                "consumes": [
-                    "application/json",
-                    "application/octet-stream",
-                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
-                    "200": {
-                        "description": "",
-                        "examples": {
-                            "application/json": "{\r\n  \"tags\": [\r\n    {\r\n      \"name\": \"grass\",\r\n      \"confidence\": 0.9999997615814209\r\n    },\r\n    {\r\n      \"name\": \"outdoor\",\r\n      \"confidence\": 0.99997067451477051\r\n    },\r\n    {\r\n      \"name\": \"sky\",\r\n      \"confidence\": 0.99928975105285645\r\n    },\r\n    {\r\n      \"name\": \"building\",\r\n      \"confidence\": 0.99646323919296265\r\n    },\r\n    {\r\n      \"name\": \"house\",\r\n      \"confidence\": 0.99279803037643433\r\n    },\r\n    {\r\n      \"name\": \"lawn\",\r\n      \"confidence\": 0.82268029451370239\r\n    },\r\n    {\r\n      \"name\": \"green\",\r\n      \"confidence\": 0.64122253656387329\r\n    },\r\n    {\r\n      \"name\": \"residential\",\r\n      \"confidence\": 0.31403225660324097\r\n    }\r\n  ],\r\n  \"requestId\": \"1ad0e45e-b7b4-4be3-8042-53be96103337\",\r\n  \"metadata\": {\r\n    \"width\": 400,\r\n    \"height\": 400,\r\n    \"format\": \"Jpeg\"\r\n  }\r\n}"
-                        }
-                    },
-                    "400": {
-                        "description": "Possible Errors: \r\n<ul>\r\n<li><b>InvalidImageUrl</b>\r\n<br/>Image URL is badly formatted or not accessible.\r\n</li>\r\n<li><b>InvalidImageFormat</b>\r\n<br/>Input data is not a valid image.</li>\r\n<li><b>InvalidImageSize</b>\r\n<br/>Input image is too large.</li>\r\n<li><b>NotSupportedImage</b>\r\n<br/>Unsupported image, e.g. child pornography.</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"InvalidImageFormat\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"The input file is not in a valid image format that the service can support. \"\r\n}"
-                        }
-                    },
-                    "415": {
-                        "description": "Unsupported media type error. Content-Type is not in the allowed types:<br/>\r\n<ul>\r\n<li>For an image URL: Content-Type should be application/json</li>\r\n<li>For a binary image data: Content-Type should be application/octet-stream or multipart/form-data</li>\r\n</ul>",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"BadArgument\",\r\n    \"message\":\"Invalid Media Type\"\r\n}"
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "500": {
-                        "description": "Possible Errors:\r\n<ul>\r\n<li><b>FailedToProcess</b>\r\n<br/>Failed to process the image.</li>\r\n<li><b>Timeout</b>\r\n<br/>Image processing time out.</li>\r\n<li><b>InternalServerError</b>\r\n<br/>Internal server error.</li>\r\n</ul> ",
-                        "examples": {
-                            "application/json": "{\r\n    \"code\":\"FailedToProcess\",\r\n\t\"requestId\":\"B8D802CF-DD8F-4E61-B15C-9E6C5844CCBC\",\r\n\t\"message\":\"Could not extract image features\"\r\n}"
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
-            }
-        },
-        "/textOperations/{operationId}": {
+            },
             "get": {
-                "description": "This interface is used for getting handwritten text operation result. The URL to this interface should be retrieved from <b>\"Operation-Location\"</b> field returned from Recognize Handwritten Text interface.",
-                "operationId": "587f2cf1154055056008f201",
-                "summary": "Get Handwritten Text Operation Result",
+                "description": "Get information about a specific product recognition run.",
+                "operationId": "644aba14fb42681ae06f1b0c",
+                "summary": "ProductRecognition_Get",
                 "parameters": [
                     {
-                        "name": "operationId",
+                        "name": "modelName",
                         "in": "path",
-                        "description": "Id of the text operation returned in the response of the <a href=\"/docs/services/56f91f2d778daf23d8ec6739/operations/587f2c6a154055056008f200\">Recognize Handwritten Text</a> interface.",
+                        "description": "The name of the model the product recognition run belongs to.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "runName",
+                        "in": "path",
+                        "description": "The name of the product recognition run.",
                         "required": true,
                         "type": "string"
                     }
+                ],
+                "produces": [
+                    "application/json",
+                    "text/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/ProductRecognitionApiModel"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/productrecognition/{modelName}/runs": {
+            "get": {
+                "description": "List all product recognition run of a model.",
+                "operationId": "644aba14fb42681ae06f1b0e",
+                "summary": "ProductRecognition_List",
+                "parameters": [
+                    {
+                        "name": "modelName",
+                        "in": "path",
+                        "description": "The name of the model the product recognition runs belongs to.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Format - int32. Number of product recognition runs to be skipped.",
+                        "type": "integer",
+                        "default": 0
+                    },
+                    {
+                        "name": "top",
+                        "in": "query",
+                        "description": "Format - int32. Number of product recognition runs to be returned after skipping. The maximum allowed value is 30.",
+                        "type": "integer",
+                        "default": 10
+                    }
+                ],
+                "produces": [
+                    "application/json",
+                    "text/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/ProductRecognitionApiModelCollectionApiModel"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "headers": {
+                            "x-ms-error-code": {
+                                "type": "string"
+                            }
+                        },
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/imageanalysis:segment": {
+            "post": {
+                "description": "Analyze the input image without deployment. The request either contains an image stream with any content type ['image/*', 'application/octet-stream'], or a JSON payload which includes a url property to be used to retrieve the image stream. An image stream of content type 'image/png' is returned, where the pixel values depend on the analysis mode. The returned image has the same dimensions as the input image for modes: foregroundMatting. The returned image has the same aspect ratio and same dimensions as the input image up to a limit of 16 megapixels for modes: backgroundRemoval.",
+                "operationId": "63e6b6d9217d201194bbecbd",
+                "summary": "Segment",
+                "parameters": [
+                    {
+                        "name": "mode",
+                        "in": "query",
+                        "description": "The analysis mode requested.",
+                        "type": "string",
+                        "enum": [
+                            "backgroundRemoval",
+                            "foregroundMatting"
+                        ]
+                    },
+                    {
+                        "name": "imageUrl",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/ImageUrl"
+                        },
+                        "description": "A JSON document with a URL pointing to the image that is to be analyzed."
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "image/png"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Imageanalysis-segmentPost200ImagePngResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/retrieval:vectorizeImage": {
+            "post": {
+                "description": "Return vector from an image.",
+                "operationId": "63ed8e8a5ddd171058e2e1f0",
+                "summary": "VectorizeImage",
+                "parameters": [
+                    {
+                        "name": "model-version",
+                        "in": "query",
+                        "description": "Model version.",
+                        "type": "string"
+                    },
+                    {
+                        "name": "imageUrl",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/ImageUrl"
+                        },
+                        "description": "A JSON document with a URL pointing to the image that is to be analyzed."
+                    }
+                ],
+                "consumes": [
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
                     "200": {
-                        "description": "Returns the operation status. Possible values of \"status\" field are:\r\n      <table class=\"element table\">\r\n      <thead>\r\n      <tr><th>Status Code</th><th>Description</th></tr>\r\n      </thead>\r\n      <tbody>\r\n      <tr><td>NotStarted</td><td>The text recognition process has not started.</td></tr>\r\n      <tr><td>Running</td><td>The text recognition is being processed.</td></tr> \r\n\t  <tr><td>Failed</td><td>The text recognition process failed.</td></tr>\r\n\t  <tr><td>Succeeded</td><td>The text recognition process succeeded.</td></tr>\r\n\t  </tbody>\r\n      </table>\r\n\r\n\r\nIf the status is \"Succeeded\", the response JSON will include the text recognition result. The result is organized in the hierarchy of Line/Word/Text. Result fields include lines, words, bounding box and text:\r\n<br>\r\n<br><b>lines</b>\r\n<br>\r\nAn array of objects, where each object represents a line of recognized text. The maximum number of lines returned is 300\r\nper page.<br/>\r\nThe order of text lines generally goes left to right, top to bottom, although in certain cases proximity is treated with\r\nhigher priority. Sorting order may change based on text detection result, and thus across images and versions the order\r\nmay change. Due to this, order should not be used for logic. Use the location returned in bounding box to build logic on\r\ntop of.\r\n<br><b>words</b>\r\n<br>\r\nAn array of objects, where each object represents a recognized word.\r\n<br><b>boundingBox</b>\r\n<br>\r\nBounding box of a recognized region, line, or word, depending on the parent object. The eight integers represent the four points (x-coordinate, y-coordinate) of the detected rectangle from the left-top corner and clockwise. \r\n<br><b>text</b>\r\n<br>\r\nString value of a recognized word/line.\r\n<br>",
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/SingleVectorResultApiModel"
+                        },
                         "examples": {
-                            "application/json": "{\r\n  \"status\": \"Succeeded\",\r\n  \"recognitionResult\": {\r\n    \"lines\": [\r\n      {\r\n        \"boundingBox\": [\r\n          202,\r\n          618,\r\n          2047,\r\n          643,\r\n          2046,\r\n          840,\r\n          200,\r\n          813\r\n        ],\r\n        \"text\": \"Our greatest glory is not\",\r\n        \"words\": [\r\n          {\r\n            \"boundingBox\": [\r\n              204,\r\n              627,\r\n              481,\r\n              628,\r\n              481,\r\n              830,\r\n              204,\r\n              829\r\n            ],\r\n            \"text\": \"Our\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              519,\r\n              628,\r\n              1057,\r\n              630,\r\n              1057,\r\n              832,\r\n              518,\r\n              830\r\n            ],\r\n           \"text\": \"greatest\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              1114,\r\n              630,\r\n              1549,\r\n              631,\r\n              1548,\r\n              833,\r\n              1114,\r\n              832\r\n            ],\r\n            \"text\": \"glory\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              1586,\r\n              631,\r\n              1785,\r\n              632,\r\n              1784,\r\n              834,\r\n              1586,\r\n              833\r\n            ],\r\n            \"text\": \"is\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              1822,\r\n              632,\r\n              2115,\r\n              633,\r\n              2115,\r\n              835,\r\n              1822,\r\n              834\r\n            ],\r\n            \"text\": \"not\"\r\n          }\r\n        ]\r\n      },\r\n      {\r\n        \"boundingBox\": [\r\n          420,\r\n          1273,\r\n          2954,\r\n          1250,\r\n          2958,\r\n          1488,\r\n          422,\r\n          1511\r\n        ],\r\n        \"text\": \"but in rising every time we fall\",\r\n        \"words\": [\r\n          {\r\n            \"boundingBox\": [\r\n              423,\r\n              1269,\r\n              634,\r\n              1268,\r\n              635,\r\n              1507,\r\n              424,\r\n              1508\r\n            ],\r\n            \"text\": \"but\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              667,\r\n              1268,\r\n              808,\r\n              1268,\r\n              809,\r\n              1506,\r\n              668,\r\n              1507\r\n            ],\r\n            \"text\": \"in\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              874,\r\n              1267,\r\n              1289,\r\n              1265,\r\n              1290,\r\n              1504,\r\n              875,\r\n              1506\r\n            ],\r\n            \"text\": \"rising\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              1331,\r\n              1265,\r\n              1771,\r\n              1263,\r\n              1772,\r\n              1502,\r\n              1332,\r\n              1504\r\n            ],\r\n            \"text\": \"every\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              1812,\r\n              1263,\r\n              2178,\r\n              1261,\r\n              2179,\r\n              1500,\r\n              1813,\r\n              1502\r\n            ],\r\n            \"text\": \"time\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              2219,\r\n              1261,\r\n              2510,\r\n              1260,\r\n              2511,\r\n              1498,\r\n              2220,\r\n              1500\r\n            ],\r\n            \"text\": \"we\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              2551,\r\n              1260,\r\n              3016,\r\n              1258,\r\n              3017,\r\n              1496,\r\n              2552,\r\n              1498\r\n            ],\r\n            \"text\": \"fall\"\r\n          }\r\n        ]\r\n      },\r\n      {\r\n        \"boundingBox\": [\r\n          1612,\r\n          903,\r\n          2744,\r\n          935,\r\n          2738,\r\n          1139,\r\n          1607,\r\n          1107\r\n        ],\r\n        \"text\": \"in never failing ,\",\r\n        \"words\": [\r\n          {\r\n            \"boundingBox\": [\r\n              1611,\r\n              934,\r\n              1707,\r\n              933,\r\n              1708,\r\n              1147,\r\n              1613,\r\n              1147\r\n            ],\r\n            \"text\": \"in\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              1753,\r\n              933,\r\n              2132,\r\n              930,\r\n              2133,\r\n              1144,\r\n              1754,\r\n              1146\r\n            ],\r\n            \"text\": \"never\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              2162,\r\n              930,\r\n              2673,\r\n              927,\r\n              2674,\r\n              1140,\r\n              2164,\r\n              1144\r\n            ],\r\n           \"text\": \"failing\"\r\n          },\r\n          {\r\n            \"boundingBox\": [\r\n              2703,\r\n              926,\r\n              2788,\r\n              926,\r\n              2790,\r\n              1139,\r\n              2705,\r\n              1140\r\n            ],\r\n           \"text\": \",\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}"
-                        }
-                    },
-                    "400": {
-                        "description": "Return 400 if operation ID is invalid or expired.\r\n",
-                        "examples": {
-                            "application/json": "{\r\n    \"error\": {\r\n        \"code\": \"BadArgument\", \r\n        \"message\": \"Operation ID is invalid or expired.\"\r\n    }\r\n}\r\n"
+                            "application/json": "{\r\n  \"vector\": [\r\n    0.0\r\n  ],\r\n  \"modelVersion\": \"string\"\r\n}"
                         }
                     },
                     "500": {
-                        "description": "Returns 500 if there's any internal error.",
-                        "examples": {
-                            "application/json": "{\r\n    \"error\": {\r\n        \"code\": \"Unspecified\", \r\n        \"message\": \"Internal server error.\"\r\n    }\r\n}"
-                        }
-                    },
-                    "503": {
-                        "description": "Returns 503 if transient faults occurred when dealing with Windows Azure storage services.",
-                        "examples": {
-                            "application/json": "{\r\n    \"error\": {\r\n        \"code\": \"StorageException\", \r\n        \"message\": \"Transient faults occurred when dealing with Windows Azure storage services, please try it later.\"\r\n    }\r\n}"
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/recognizeText": {
+        "/retrieval:vectorizeText": {
             "post": {
-                "description": "Use this interface to get the result of a Recognize Handwritten Text operation. When you use the Recognize Handwritten Text interface, the response contains a field called \"Operation-Location\". The \"Operation-Location\" field contains the URL that you must use for your Get Handwritten Text Operation Result operation.\r\n<br>\r\n<br>\r\nFor the result of a Recognize Handwritten Text operation to be available, it requires an amount of time that depends on the length of the text. So, you may need to wait before using this Get Handwritten Text Operation Result interface. The time you need to wait may be up to a number of seconds.\r\n<br>\r\n<br>\r\nNote: this technology is currently in preview and is only available for English text.",
-                "operationId": "587f2c6a154055056008f200",
-                "summary": "Recognize Handwritten Text",
+                "description": "Return vector from a text.",
+                "operationId": "63ed8e8a5ddd171058e2e1ef",
+                "summary": "VectorizeText",
                 "parameters": [
                     {
-                        "name": "handwriting",
+                        "name": "model-version",
                         "in": "query",
-                        "description": "If this parameter is set to “true” or is not specified, handwriting recognition is performed. If “false” is specified, printed text recognition is performed by calling <a href=\"/docs/services/56f91f2d778daf23d8ec6739/operations/56f91f2e778daf14a499e1fc\">OCR</a> operation.",
-                        "required": true,
-                        "type": "boolean",
-                        "default": true,
-                        "enum": [
-                            true,
-                            false
-                        ]
+                        "description": "Model version.",
+                        "type": "string"
                     },
                     {
-                        "name": "body",
+                        "name": "vectorizeTextRequestApiModel",
                         "in": "body",
                         "schema": {
-                            "example": "[Binary image data]"
+                            "$ref": "#/definitions/VectorizeTextRequestApiModel"
                         },
-                        "description": "Input passed within the POST body. Supported input methods: raw image binary or image URL.\r\n<br />\r\n<br />Input requirements:\r\n<ul>\r\n    <li>Supported image formats: JPEG, PNG and BMP. </li>\r\n    <li>Image file size must be less than 4MB.</li>\r\n    <li>Image dimensions must be at least 50 x 50 pixels and at most 4200 x 4200 pixels.</li>\r\n</ul>"
+                        "description": "Request of VectorizeText."
                     }
                 ],
                 "consumes": [
-                    "application/json",
-                    "application/octet-stream"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "responses": {
-                    "202": {
-                        "description": "The service has accepted the request and will start processing later.\r\n<br>\r\nIt will return Accepted immediately and include an <b>\"Operation-Location\"</b> header. Client side should further query the operation status using the URL specified in this header. The operation ID will expire in 48 hours.\r\n<br>\r\n<table class=\"element table\">\r\n            <thead>\r\n            </thead>\r\n            <tbody>\r\n            <tr><td><b>Operation-Location</b></td><td>Client side should use this URL to query operation status/result. <br/> Example: https://cognitiveservice/vision/v1.0/textOperations/49a36324-fc4b-4387-aa06-090cfbf0064f\r\n.</td></tr>\r\n             </tbody>\r\n</table>"
-                    },
-                    "400": {
-                        "description": " Error code and message returned in JSON:\r\n      <table class=\"element table\">\r\n      <thead>\r\n      <tr><th>Error Code</th><th>Description</th></tr>\r\n      </thead>\r\n      <tbody>\r\n      <tr><td>BadArgument</td><td>Bad or unrecognizable request JSON or binary file.</td></tr>\r\n      <tr><td>InvalidImageURL</td><td>Image URL is badly formatted.</td></tr>\r\n\t  <tr><td>FailedToDownloadImage</td><td>Failed to download image from input URL.</td></tr>\r\n\t  <tr><td>InvalidImage</td><td>The input data is not a valid image.</td></tr>\r\n\t  <tr><td>UnsupportedImageFormat</td><td>Image format unsupported. Supported formats include JPEG, PNG and BMP.</td></tr>\r\n\t  <tr><td>InvalidImageSize</td><td>The input image is too large. It should not be larger than 4MB.</td></tr>\r\n\t  <tr><td>InvalidImageDimension</td><td>The input image dimension is out of range. The maximum image size is 4200 x 4200 pixels, and the minimum image size is 50 x 50 pixels.</td></tr>\r\n\t  </tbody>\r\n      </table>",
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/SingleVectorResultApiModel"
+                        },
                         "examples": {
-                            "application/json": "{ \r\n    \"error\": {\r\n        \"code\": \"BadArgument\", \r\n        \"message\": \"Invalid input.\"\r\n    }\r\n}"
-                        }
-                    },
-                    "415": {
-                        "description": "Unsupported media type error. \"Content-Type\" does not match the post content.\r\n<br>\r\n<ul>\r\n<li>For image URL, \"Content-Type\" should be application/json</li>\r\n<li>For binary image data, \"Content-Type\" should be application/octet-stream</li>\r\n</ul>\r\n<br>\r\n",
-                        "examples": {
-                            "application/json": "{\r\n    \"error\": {\r\n        \"code\": \"BadArgument\",\r\n        \"message\": \"Unsupported media type.\"\r\n    }\r\n}"
+                            "application/json": "{\r\n  \"vector\": [\r\n    0.0\r\n  ],\r\n  \"modelVersion\": \"string\"\r\n}"
                         }
                     },
                     "500": {
-                        "description": "Returns 500 if there's any internal error.",
-                        "examples": {
-                            "application/json": "{\r\n    \"error\": {\r\n        \"code\": \"Unspecified\", \r\n        \"message\": \"Internal server error.\"\r\n    }\r\n}"
-                        }
-                    },
-                    "503": {
-                        "description": "Returns 503 if transient faults occurred when dealing with Windows Azure storage services.",
-                        "examples": {
-                            "application/json": "{\r\n    \"error\": {\r\n        \"code\": \"StorageException\", \r\n        \"message\": \"Transient faults occurred when dealing with Windows Azure storage services, please try it later.\"\r\n    }\r\n}"
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
             }
+        }
+    },
+    "definitions": {
+        "Dataset": {
+            "description": "Describes a dataset, which represents a set of images and annotations that can be used for training or testing a model.",
+            "required": [
+                "annotationKind",
+                "createdDateTime",
+                "eTag",
+                "name",
+                "updatedDateTime"
+            ],
+            "type": "object",
+            "properties": {
+                "annotationKind": {
+                    "description": "The kind of annotations contained in the annotation files.\r\nFor example, \"ImageClassification\" to specify that the annotation file contain object labels for training or testing a multiclass image classification model.",
+                    "enum": [
+                        "imageClassification",
+                        "imageObjectDetection"
+                    ],
+                    "type": "string"
+                },
+                "annotationFileUris": {
+                    "description": "List of absolute URIs to annotation files, each of which must be stored as a blob in an Azure Storage blob container.\r\nEach file must follow the COCO format for the specified AnnotationKind, with each image path being an absolute URI to a blob in a blob container.\r\nThe Computer Vision resource must have permission to read the annotation files and all referenced image files.\r\nThis can be done by turning on System managed identities for the Computer Vision resource, then assigning the identity to a role that has permission to read from the blob container containing the annotation and image files.",
+                    "maxItems": 10,
+                    "type": "array",
+                    "items": {
+                        "format": "uri",
+                        "type": "string"
+                    }
+                },
+                "customProperties": {
+                    "description": "Dictionary of arbitrary key-value pairs for use by the application. A maximum of 10 key-value pairs are allowed.",
+                    "maxLength": 10,
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "description": "Read only. The name that is used to uniquely identify the dataset.",
+                    "maxLength": 255,
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                },
+                "createdDateTime": {
+                    "format": "date-time",
+                    "description": "Read only. The date and time when the dataset was first registered, in UTC.",
+                    "type": "string"
+                },
+                "updatedDateTime": {
+                    "format": "date-time",
+                    "description": "Read only. The date and time when the dataset was last updated, in UTC.",
+                    "type": "string"
+                },
+                "eTag": {
+                    "description": "Read only. The latest ETag for the dataset. May be used with the 'If-Match' header when updating or deleting a dataset.",
+                    "type": "string"
+                },
+                "authentication": {
+                    "$ref": "#/definitions/StorageAuthenticationSettingsApiModel"
+                }
+            },
+            "example": "{\r\n  \"annotationKind\": \"imageClassification\",\r\n  \"annotationFileUris\": [\r\n    \"string\"\r\n  ],\r\n  \"customProperties\": {},\r\n  \"name\": \"string\",\r\n  \"createdDateTime\": \"string\",\r\n  \"updatedDateTime\": \"string\",\r\n  \"eTag\": \"string\",\r\n  \"authentication\": {\r\n    \"kind\": \"none\",\r\n    \"sasToken\": \"string\"\r\n  }\r\n}"
+        },
+        "DatasetApiModelCollectionApiModel": {
+            "description": "Contains an array of results that may be paginated.",
+            "required": [
+                "value"
+            ],
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "The array of results.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Dataset"
+                    }
+                },
+                "nextLink": {
+                    "description": "A link to the next set of paginated results, if there are more results available; not present otherwise.",
+                    "type": "string"
+                }
+            }
+        },
+        "ErrorResponse": {
+            "description": "Response returned when an error occurs.",
+            "required": [
+                "error"
+            ],
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/ErrorResponseDetails"
+                }
+            }
+        },
+        "ErrorResponseDetails": {
+            "description": "Error info.",
+            "required": [
+                "code",
+                "message"
+            ],
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "Error code.",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "Error message.",
+                    "type": "string"
+                },
+                "target": {
+                    "description": "Target of the error.",
+                    "type": "string"
+                },
+                "details": {
+                    "description": "List of detailed errors.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ErrorResponseDetails"
+                    }
+                },
+                "innererror": {
+                    "$ref": "#/definitions/ErrorResponseInnerError"
+                }
+            }
+        },
+        "ErrorResponseInnerError": {
+            "description": "Detailed error.",
+            "required": [
+                "code",
+                "message"
+            ],
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "Error code.",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "Error message.",
+                    "type": "string"
+                },
+                "innererror": {
+                    "$ref": "#/definitions/ErrorResponseInnerError"
+                }
+            }
+        },
+        "Model": {
+            "description": "Describes a training run for training a custom model.",
+            "required": [
+                "createdDateTime",
+                "name",
+                "status",
+                "trainingParameters",
+                "updatedDateTime"
+            ],
+            "type": "object",
+            "properties": {
+                "trainingParameters": {
+                    "$ref": "#/definitions/TrainingParameters"
+                },
+                "name": {
+                    "description": "Read only. The name that is used to uniquely identify the training run.",
+                    "maxLength": 255,
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                },
+                "createdDateTime": {
+                    "format": "date-time",
+                    "description": "Read only. The date and time when the training run was first created, in UTC.",
+                    "type": "string"
+                },
+                "updatedDateTime": {
+                    "format": "date-time",
+                    "description": "Read only. The date and time when the training run was last updated, in UTC.",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Read only. The current state of the training run.",
+                    "enum": [
+                        "notStarted",
+                        "training",
+                        "succeeded",
+                        "failed",
+                        "cancelling",
+                        "cancelled"
+                    ],
+                    "type": "string"
+                },
+                "trainingCostInMinutes": {
+                    "format": "int32",
+                    "description": "Read only. Actual training cost consumed, in minutes. Present only if the training run as completed.",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "error": {
+                    "$ref": "#/definitions/ErrorResponseDetails"
+                },
+                "modelPerformance": {
+                    "$ref": "#/definitions/ModelPerformance"
+                },
+                "evaluationParameters": {
+                    "$ref": "#/definitions/ModelEvaluationParameters"
+                }
+            }
+        },
+        "ModelApiModelCollectionApiModel": {
+            "description": "Contains an array of results that may be paginated.",
+            "required": [
+                "value"
+            ],
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "The array of results.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Model"
+                    }
+                },
+                "nextLink": {
+                    "description": "A link to the next set of paginated results, if there are more results available; not present otherwise.",
+                    "type": "string"
+                }
+            }
+        },
+        "ModelEvaluation": {
+            "description": "Describes an evaluation run for evaluating the accuracy of a model using a test set.",
+            "required": [
+                "createdDateTime",
+                "evaluationParameters",
+                "modelName",
+                "name",
+                "status",
+                "updatedDateTime"
+            ],
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "Read only. The name that is used to uniquely identify the evaluation run.",
+                    "maxLength": 255,
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                },
+                "modelName": {
+                    "description": "Read only. The model to evaluate.",
+                    "maxLength": 255,
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                },
+                "createdDateTime": {
+                    "format": "date-time",
+                    "description": "Read only. The date and time when the evaluation run was first created, in UTC.",
+                    "type": "string"
+                },
+                "updatedDateTime": {
+                    "format": "date-time",
+                    "description": "Read only. The date and time when the evaluation run was last updated, in UTC.",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Read only. The current state of the evaluation run.",
+                    "enum": [
+                        "notStarted",
+                        "running",
+                        "succeeded",
+                        "failed"
+                    ],
+                    "type": "string"
+                },
+                "evaluationParameters": {
+                    "$ref": "#/definitions/ModelEvaluationParameters"
+                },
+                "error": {
+                    "$ref": "#/definitions/ErrorResponseDetails"
+                },
+                "modelPerformance": {
+                    "$ref": "#/definitions/ModelPerformance"
+                }
+            }
+        },
+        "ModelEvaluationApiModelCollectionApiModel": {
+            "description": "Contains an array of results that may be paginated.",
+            "required": [
+                "value"
+            ],
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "The array of results.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ModelEvaluation"
+                    }
+                },
+                "nextLink": {
+                    "description": "A link to the next set of paginated results, if there are more results available; not present otherwise.",
+                    "type": "string"
+                }
+            }
+        },
+        "ModelEvaluationParameters": {
+            "description": "Parameters for specifying how a model is evaluated.",
+            "type": "object",
+            "properties": {
+                "testDatasetName": {
+                    "description": "The dataset name used for testing.",
+                    "maxLength": 255,
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                }
+            }
+        },
+        "ModelPerformance": {
+            "description": "Performance metrics for a custom trained model.",
+            "required": [
+                "tagPerformance"
+            ],
+            "type": "object",
+            "properties": {
+                "accuracyTop1": {
+                    "format": "double",
+                    "description": "Read only. For multiclass classification models. The proportion of test samples where the ground truth class matches the predicted class.",
+                    "type": "number",
+                    "readOnly": true
+                },
+                "accuracyTop5": {
+                    "format": "double",
+                    "description": "Read only. For multiclass classification models. The proportion of test samples where the ground truth class is in the top five predicted classes.",
+                    "type": "number",
+                    "readOnly": true
+                },
+                "averagePrecision": {
+                    "format": "double",
+                    "description": "Read only. A measure of the model performance, it summarizes the precision and recall at different confidence thresholds.",
+                    "type": "number",
+                    "readOnly": true
+                },
+                "calibrationECE": {
+                    "format": "double",
+                    "description": "Read only. For multiclass classification models. Expected calibration error.",
+                    "type": "number",
+                    "readOnly": true
+                },
+                "meanAveragePrecision30": {
+                    "format": "double",
+                    "description": "Read only. For object detection models. Mean average precision at a threshold of 30%.",
+                    "type": "number",
+                    "readOnly": true
+                },
+                "meanAveragePrecision50": {
+                    "format": "double",
+                    "description": "Read only. For object detection models. Mean average precision at a threshold of 50%.",
+                    "type": "number",
+                    "readOnly": true
+                },
+                "meanAveragePrecision75": {
+                    "format": "double",
+                    "description": "Read only. For object detection models. Mean average precision at a threshold of 75%.",
+                    "type": "number",
+                    "readOnly": true
+                },
+                "tagPerformance": {
+                    "description": "Read only. Performance metrics for each tag recognized by the model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/ModelTagPerformance"
+                    }
+                }
+            }
+        },
+        "ModelTagPerformance": {
+            "description": "Performance metrics for each tag recognized by a custom trained model.",
+            "type": "object",
+            "properties": {
+                "accuracy": {
+                    "format": "double",
+                    "description": "Read only. For multiclass models. Tag accuracy.",
+                    "type": "number",
+                    "readOnly": true
+                },
+                "averagePrecision50": {
+                    "format": "double",
+                    "description": "Read only. For object detection models. Average precision at a threshold of 50%.",
+                    "type": "number",
+                    "readOnly": true
+                }
+            }
+        },
+        "StorageAuthenticationSettingsApiModel": {
+            "description": "Describes the storage authentication settings.",
+            "required": [
+                "kind"
+            ],
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "description": "The storage authentication kind.",
+                    "enum": [
+                        "none",
+                        "managedIdentity",
+                        "sas"
+                    ],
+                    "type": "string"
+                },
+                "sasToken": {
+                    "description": "Optional. The sas token to access container. Only needed when Kind = Sas.",
+                    "type": "string"
+                }
+            }
+        },
+        "TrainingParameters": {
+            "description": "Parameters for specifying how a training run trains a custom model.",
+            "required": [
+                "timeBudgetInHours",
+                "trainingDatasetName"
+            ],
+            "type": "object",
+            "properties": {
+                "trainingDatasetName": {
+                    "description": "The dataset name used for training.",
+                    "maxLength": 255,
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                },
+                "timeBudgetInHours": {
+                    "format": "int32",
+                    "description": "Time budget for training, in hours. The minimum allowed value is 1, and the maximum allowed value is 336 hours for GenericClassifier, 1344 hours for GenericDetector.\r\nThis is the maximum amount of compute time that will be spent to train the model.",
+                    "maximum": 1344,
+                    "minimum": 1,
+                    "type": "integer"
+                },
+                "modelKind": {
+                    "description": "Model kind.",
+                    "enum": [
+                        "Product-Recognizer",
+                        "Generic-Classifier",
+                        "Generic-Detector"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "AdultMatch": {
+            "description": "An object describing adult content match.",
+            "required": [
+                "confidence",
+                "isMatch"
+            ],
+            "type": "object",
+            "properties": {
+                "isMatch": {
+                    "description": "A value indicating if the image is matched adult content.",
+                    "type": "boolean"
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "A value indicating the confidence level of matched adult content.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "AdultResult": {
+            "description": "An object describing whether the image contains adult-oriented content and/or is racy.",
+            "required": [
+                "adult",
+                "gore",
+                "racy"
+            ],
+            "type": "object",
+            "properties": {
+                "adult": {
+                    "$ref": "#/definitions/AdultMatch"
+                },
+                "racy": {
+                    "$ref": "#/definitions/AdultMatch"
+                },
+                "gore": {
+                    "$ref": "#/definitions/AdultMatch"
+                }
+            }
+        },
+        "BoundingBox": {
+            "description": "A bounding box for an area inside an image.",
+            "required": [
+                "h",
+                "w",
+                "x",
+                "y"
+            ],
+            "type": "object",
+            "properties": {
+                "x": {
+                    "format": "int32",
+                    "description": "Left-coordinate of the top left point of the area, in pixels.",
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "y": {
+                    "format": "int32",
+                    "description": "Top-coordinate of the top left point of the area, in pixels.",
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "w": {
+                    "format": "int32",
+                    "description": "Width measured from the top-left point of the area, in pixels.",
+                    "minimum": 1,
+                    "type": "integer"
+                },
+                "h": {
+                    "format": "int32",
+                    "description": "Height measured from the top-left point of the area, in pixels.",
+                    "minimum": 1,
+                    "type": "integer"
+                }
+            }
+        },
+        "CaptionResult": {
+            "description": "A brief description of what the image depicts.",
+            "required": [
+                "confidence",
+                "text"
+            ],
+            "type": "object",
+            "properties": {
+                "text": {
+                    "description": "The text of the caption.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "The level of confidence the service has in the caption.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "CropRegion": {
+            "description": "A region identified for smart cropping. There will be one region returned for each requested aspect ratio.",
+            "required": [
+                "aspectRatio",
+                "boundingBox"
+            ],
+            "type": "object",
+            "properties": {
+                "aspectRatio": {
+                    "format": "double",
+                    "description": "The aspect ratio of the crop region.",
+                    "type": "number"
+                },
+                "boundingBox": {
+                    "$ref": "#/definitions/BoundingBox"
+                }
+            }
+        },
+        "DenseCaption": {
+            "description": "A brief description of what the image depicts.",
+            "required": [
+                "confidence",
+                "text"
+            ],
+            "type": "object",
+            "properties": {
+                "text": {
+                    "description": "The text of the caption.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "The level of confidence the service has in the caption.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "boundingBox": {
+                    "$ref": "#/definitions/BoundingBox"
+                }
+            }
+        },
+        "DenseCaptionsResult": {
+            "description": "A list of captions.",
+            "required": [
+                "values"
+            ],
+            "type": "object",
+            "properties": {
+                "values": {
+                    "description": "A list of captions.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DenseCaption"
+                    }
+                }
+            }
+        },
+        "Description": {
+            "description": "A brief description of what the image depicts.",
+            "required": [
+                "confidence",
+                "text"
+            ],
+            "type": "object",
+            "properties": {
+                "text": {
+                    "description": "The text of the caption.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "The level of confidence the service has in the caption.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "DescriptionResult": {
+            "description": "A list of descriptions sorted by confidence level.",
+            "required": [
+                "values"
+            ],
+            "type": "object",
+            "properties": {
+                "values": {
+                    "description": "A list of descriptions sorted by confidence level.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Description"
+                    }
+                }
+            }
+        },
+        "DetectedObject": {
+            "description": "Describes a detected object in an image.",
+            "required": [
+                "boundingBox",
+                "tags"
+            ],
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Id of the detected object.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "boundingBox": {
+                    "$ref": "#/definitions/BoundingBox"
+                },
+                "tags": {
+                    "description": "Classification confidences of the detected object.",
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Tag"
+                    }
+                }
+            }
+        },
+        "DetectedPerson": {
+            "description": "A person detected in an image.",
+            "required": [
+                "boundingBox",
+                "confidence"
+            ],
+            "type": "object",
+            "properties": {
+                "boundingBox": {
+                    "$ref": "#/definitions/BoundingBox"
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "Confidence score of having observed the person in the image, as a value ranging from 0 to 1.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "DocumentLanguage": {
+            "description": "An object representing the detected language for a given text span.",
+            "required": [
+                "confidence",
+                "languageCode",
+                "spans"
+            ],
+            "type": "object",
+            "properties": {
+                "spans": {
+                    "description": "Location of the text elements in the concatenated content the language applies to.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentSpan"
+                    }
+                },
+                "languageCode": {
+                    "description": "Detected language. Value may an ISO 639-1 language code (ex. \"en\", \"fr\") or BCP 47 language tag (ex. \"zh-Hans\").",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "Confidence of correctly identifying the language.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "DocumentLine": {
+            "description": "A content line object consisting of an adjacent sequence of content elements, such as words and selection marks.",
+            "required": [
+                "boundingBox",
+                "content",
+                "spans"
+            ],
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Concatenated content of the contained elements in reading order.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "boundingBox": {
+                    "description": "Bounding box of the line.",
+                    "type": "array",
+                    "items": {
+                        "format": "double",
+                        "type": "number"
+                    }
+                },
+                "spans": {
+                    "description": "Location of the line in the reading order concatenated content.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentSpan"
+                    }
+                }
+            }
+        },
+        "DocumentPage": {
+            "description": "The content and layout elements extracted from a page from the input.",
+            "required": [
+                "angle",
+                "height",
+                "lines",
+                "pageNumber",
+                "spans",
+                "width",
+                "words"
+            ],
+            "type": "object",
+            "properties": {
+                "height": {
+                    "format": "double",
+                    "description": "The height of the image/PDF in pixels/inches, respectively.",
+                    "type": "number"
+                },
+                "width": {
+                    "format": "double",
+                    "description": "The width of the image/PDF in pixels/inches, respectively.",
+                    "type": "number"
+                },
+                "angle": {
+                    "format": "double",
+                    "description": "The general orientation of the content in clockwise direction, measured in degrees between (-180, 180].",
+                    "type": "number"
+                },
+                "pageNumber": {
+                    "format": "int32",
+                    "description": "1-based page number in the input document.",
+                    "type": "integer"
+                },
+                "words": {
+                    "description": "Extracted words from the page.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentWord"
+                    }
+                },
+                "spans": {
+                    "description": "Location of the page in the reading order concatenated content.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentSpan"
+                    }
+                },
+                "lines": {
+                    "description": "Extracted lines from the page, potentially containing both textual and visual elements.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentLine"
+                    }
+                }
+            }
+        },
+        "DocumentSpan": {
+            "description": "Contiguous region of the concatenated content property, specified as an offset and length.",
+            "required": [
+                "length",
+                "offset"
+            ],
+            "type": "object",
+            "properties": {
+                "offset": {
+                    "format": "int32",
+                    "description": "Zero-based index of the content represented by the span.",
+                    "type": "integer"
+                },
+                "length": {
+                    "format": "int32",
+                    "description": "Number of characters in the content represented by the span.",
+                    "type": "integer"
+                }
+            }
+        },
+        "DocumentStyle": {
+            "description": "An object representing observed text styles.",
+            "required": [
+                "spans"
+            ],
+            "type": "object",
+            "properties": {
+                "isHandwritten": {
+                    "description": "Is content handwritten or not.",
+                    "type": "boolean"
+                },
+                "spans": {
+                    "description": "Location of the text elements in the concatenated content the style applies to.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentSpan"
+                    }
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "Confidence of correctly identifying the style.",
+                    "type": "number"
+                }
+            }
+        },
+        "DocumentWord": {
+            "description": "A word object consisting of a contiguous sequence of characters. For non-space delimited languages,\r\nsuch as Chinese, Japanese, and Korean, each character is represented as its own word.",
+            "required": [
+                "boundingBox",
+                "confidence",
+                "content",
+                "span"
+            ],
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Text content of the word.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "boundingBox": {
+                    "description": "Bounding box of the word.",
+                    "type": "array",
+                    "items": {
+                        "format": "double",
+                        "type": "number"
+                    }
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "Confidence of correctly extracting the word.",
+                    "type": "number"
+                },
+                "span": {
+                    "$ref": "#/definitions/DocumentSpan"
+                }
+            }
+        },
+        "FixtureApiModel": {
+            "description": "Describes a fixture in a planogram.",
+            "required": [
+                "h",
+                "id",
+                "w",
+                "x",
+                "y"
+            ],
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Id of the fixture.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "w": {
+                    "format": "double",
+                    "description": "Width of the fixture.",
+                    "type": "number"
+                },
+                "h": {
+                    "format": "double",
+                    "description": "Height of the fixture.",
+                    "type": "number"
+                },
+                "x": {
+                    "format": "double",
+                    "description": "Left offset from the origin, in unit of in inches or centimeters.",
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "y": {
+                    "format": "double",
+                    "description": "Top offset from the origin, in unit of in inches or centimeters.",
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "ImageAnalysisResult": {
+            "description": "Describe the combined results of different types of image analysis.",
+            "required": [
+                "metadata",
+                "modelVersion"
+            ],
+            "type": "object",
+            "properties": {
+                "customModelResult": {
+                    "$ref": "#/definitions/ImagePredictionResult"
+                },
+                "captionResult": {
+                    "$ref": "#/definitions/CaptionResult"
+                },
+                "objectsResult": {
+                    "$ref": "#/definitions/ObjectsResult"
+                },
+                "readResult": {
+                    "$ref": "#/definitions/ReadResult"
+                },
+                "denseCaptionsResult": {
+                    "$ref": "#/definitions/DenseCaptionsResult"
+                },
+                "modelVersion": {
+                    "description": "Model Version.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/ImageMetadataApiModel"
+                },
+                "tagsResult": {
+                    "$ref": "#/definitions/TagsResult"
+                },
+                "adultResult": {
+                    "$ref": "#/definitions/AdultResult"
+                },
+                "smartCropsResult": {
+                    "$ref": "#/definitions/SmartCropsResult"
+                },
+                "peopleResult": {
+                    "$ref": "#/definitions/PeopleResult"
+                }
+            }
+        },
+        "ImageMetadataApiModel": {
+            "description": "The image metadata information such as height and width.",
+            "required": [
+                "height",
+                "width"
+            ],
+            "type": "object",
+            "properties": {
+                "width": {
+                    "format": "int32",
+                    "description": "The width of the image in pixels.",
+                    "minimum": 1,
+                    "type": "integer"
+                },
+                "height": {
+                    "format": "int32",
+                    "description": "The height of the image in pixels.",
+                    "minimum": 1,
+                    "type": "integer"
+                }
+            }
+        },
+        "ImagePredictionResult": {
+            "description": "Describes the prediction result of an image.",
+            "required": [
+                "objectsResult",
+                "tagsResult"
+            ],
+            "type": "object",
+            "properties": {
+                "tagsResult": {
+                    "$ref": "#/definitions/TagsResult"
+                },
+                "objectsResult": {
+                    "$ref": "#/definitions/ObjectsResult"
+                }
+            }
+        },
+        "ImageRectificationControlPointsApiModel": {
+            "description": "Four corner control points for rectification. The origin is at top-left.",
+            "required": [
+                "bottomLeft",
+                "bottomRight",
+                "topLeft",
+                "topRight"
+            ],
+            "type": "object",
+            "properties": {
+                "topLeft": {
+                    "$ref": "#/definitions/NormalizedCoordinateApiModel"
+                },
+                "topRight": {
+                    "$ref": "#/definitions/NormalizedCoordinateApiModel"
+                },
+                "bottomLeft": {
+                    "$ref": "#/definitions/NormalizedCoordinateApiModel"
+                },
+                "bottomRight": {
+                    "$ref": "#/definitions/NormalizedCoordinateApiModel"
+                }
+            }
+        },
+        "ImageRectificationRequestApiModel": {
+            "description": "Image rectification input.",
+            "required": [
+                "controlPoints",
+                "url"
+            ],
+            "type": "object",
+            "properties": {
+                "url": {
+                    "format": "uri",
+                    "description": "Source image blob URL.",
+                    "type": "string"
+                },
+                "controlPoints": {
+                    "$ref": "#/definitions/ImageRectificationControlPointsApiModel"
+                }
+            },
+            "example": "{\r\n  \"url\": \"string\",\r\n  \"controlPoints\": {\r\n    \"topLeft\": {\r\n      \"x\": 0.0,\r\n      \"y\": 0.0\r\n    },\r\n    \"topRight\": {\r\n      \"x\": 0.0,\r\n      \"y\": 0.0\r\n    },\r\n    \"bottomLeft\": {\r\n      \"x\": 0.0,\r\n      \"y\": 0.0\r\n    },\r\n    \"bottomRight\": {\r\n      \"x\": 0.0,\r\n      \"y\": 0.0\r\n    }\r\n  }\r\n}"
+        },
+        "ImageStitchingRequestApiModel": {
+            "description": "Image stitching input.",
+            "required": [
+                "images"
+            ],
+            "type": "object",
+            "properties": {
+                "images": {
+                    "description": "Source images to stitch.",
+                    "maxItems": 20,
+                    "minItems": 2,
+                    "type": "array",
+                    "items": {
+                        "format": "uri",
+                        "type": "string"
+                    }
+                }
+            },
+            "example": "{\r\n  \"images\": [\r\n    \"string\"\r\n  ]\r\n}"
+        },
+        "ImageUrl": {
+            "description": "A JSON document with a URL pointing to the image that is to be analyzed.",
+            "required": [
+                "url"
+            ],
+            "type": "object",
+            "properties": {
+                "url": {
+                    "description": "Publicly reachable URL of an image.",
+                    "type": "string"
+                }
+            },
+            "example": "{\r\n  \"url\": \"string\"\r\n}"
+        },
+        "NormalizedCoordinateApiModel": {
+            "description": "Normalized XY-coordinate.",
+            "required": [
+                "x",
+                "y"
+            ],
+            "type": "object",
+            "properties": {
+                "x": {
+                    "format": "double",
+                    "description": "Horizontal coordinate.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "y": {
+                    "format": "double",
+                    "description": "Vertical coordinate.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "ObjectsResult": {
+            "description": "Describes detected objects in an image.",
+            "required": [
+                "values"
+            ],
+            "type": "object",
+            "properties": {
+                "values": {
+                    "description": "An array of detected objects.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DetectedObject"
+                    }
+                }
+            }
+        },
+        "PeopleResult": {
+            "description": "An object describing whether the image contains people.",
+            "required": [
+                "values"
+            ],
+            "type": "object",
+            "properties": {
+                "values": {
+                    "description": "An array of detected people.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DetectedPerson"
+                    }
+                }
+            }
+        },
+        "PlanogramApiModel": {
+            "description": "Describes the planogram for planogram matching operations.",
+            "required": [
+                "fixtures",
+                "height",
+                "positions",
+                "products",
+                "width"
+            ],
+            "type": "object",
+            "properties": {
+                "width": {
+                    "format": "double",
+                    "description": "Width of the planogram.",
+                    "type": "number"
+                },
+                "height": {
+                    "format": "double",
+                    "description": "Height of the planogram.",
+                    "type": "number"
+                },
+                "products": {
+                    "description": "List of products in the planogram.",
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ProductApiModel"
+                    }
+                },
+                "fixtures": {
+                    "description": "List of fixtures in the planogram.",
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FixtureApiModel"
+                    }
+                },
+                "positions": {
+                    "description": "List of positions in the planogram.",
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PositionApiModel"
+                    }
+                }
+            }
+        },
+        "PlanogramMatchingRequestApiModel": {
+            "description": "Input to pass into the planogram matching operation.",
+            "required": [
+                "detectedProducts",
+                "planogram"
+            ],
+            "type": "object",
+            "properties": {
+                "detectedProducts": {
+                    "$ref": "#/definitions/ProductRecognitionResultApiModel"
+                },
+                "planogram": {
+                    "$ref": "#/definitions/PlanogramApiModel"
+                }
+            },
+            "example": "{\r\n  \"detectedProducts\": {\r\n    \"imageMetadata\": {\r\n      \"width\": 0,\r\n      \"height\": 0\r\n    },\r\n    \"products\": [\r\n      {\r\n        \"id\": \"string\",\r\n        \"boundingBox\": {\r\n          \"x\": 0,\r\n          \"y\": 0,\r\n          \"w\": 0,\r\n          \"h\": 0\r\n        },\r\n        \"tags\": [\r\n          {\r\n            \"name\": \"string\",\r\n            \"confidence\": 0.0\r\n          }\r\n        ]\r\n      }\r\n    ],\r\n    \"gaps\": [\r\n      {\r\n        \"id\": \"string\",\r\n        \"boundingBox\": {\r\n          \"x\": 0,\r\n          \"y\": 0,\r\n          \"w\": 0,\r\n          \"h\": 0\r\n        },\r\n        \"tags\": [\r\n          {\r\n            \"name\": \"string\",\r\n            \"confidence\": 0.0\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  },\r\n  \"planogram\": {\r\n    \"width\": 0.0,\r\n    \"height\": 0.0,\r\n    \"products\": [\r\n      {\r\n        \"id\": \"string\",\r\n        \"name\": \"string\",\r\n        \"w\": 0.0,\r\n        \"h\": 0.0\r\n      }\r\n    ],\r\n    \"fixtures\": [\r\n      {\r\n        \"id\": \"string\",\r\n        \"w\": 0.0,\r\n        \"h\": 0.0,\r\n        \"x\": 0.0,\r\n        \"y\": 0.0\r\n      }\r\n    ],\r\n    \"positions\": [\r\n      {\r\n        \"id\": \"string\",\r\n        \"productId\": \"string\",\r\n        \"fixtureId\": \"string\",\r\n        \"x\": 0.0,\r\n        \"y\": 0.0\r\n      }\r\n    ]\r\n  }\r\n}"
+        },
+        "PlanogramMatchingResultApiModel": {
+            "description": "Results from the planogram matching operation.",
+            "required": [
+                "matchingResultPerPosition"
+            ],
+            "type": "object",
+            "properties": {
+                "matchingResultPerPosition": {
+                    "description": "The matched detected object information for each planogram position.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PositionMatchingResultApiModel"
+                    }
+                }
+            }
+        },
+        "PositionApiModel": {
+            "description": "Describes a product position in a planogram.",
+            "required": [
+                "fixtureId",
+                "id",
+                "productId",
+                "x",
+                "y"
+            ],
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Id of the position.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "productId": {
+                    "description": "Id of the product.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "fixtureId": {
+                    "description": "Id of the fixture that the product is on.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "x": {
+                    "format": "double",
+                    "description": "Left offset from the origin, in unit of in inches or centimeters.",
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "y": {
+                    "format": "double",
+                    "description": "Top offset from the origin, in unit of in inches or centimeters.",
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "PositionMatchingResultApiModel": {
+            "description": "Paired planogram position ID and corresponding detected object from product understanding result.",
+            "required": [
+                "detectedObject",
+                "positionId"
+            ],
+            "type": "object",
+            "properties": {
+                "positionId": {
+                    "description": "The position ID from the planogram matched to the corresponding detected object.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "detectedObject": {
+                    "$ref": "#/definitions/DetectedObject"
+                }
+            }
+        },
+        "ProductApiModel": {
+            "description": "Describes a product in the planogram.",
+            "required": [
+                "h",
+                "id",
+                "name",
+                "w"
+            ],
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Id of the product.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name of the product.",
+                    "maxLength": 255,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "w": {
+                    "format": "double",
+                    "description": "Width of the product.",
+                    "type": "number"
+                },
+                "h": {
+                    "format": "double",
+                    "description": "Height of the fixture.",
+                    "type": "number"
+                }
+            }
+        },
+        "ProductRecognitionApiModel": {
+            "description": "Describes a product recognition run against a model.",
+            "required": [
+                "createdDateTime",
+                "modelName",
+                "result",
+                "runName",
+                "status",
+                "updatedDateTime"
+            ],
+            "type": "object",
+            "properties": {
+                "runName": {
+                    "description": "Read only. The name that is used to uniquely identify the product recognition run.",
+                    "maxLength": 255,
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                },
+                "modelName": {
+                    "description": "Read only. The model to run product recognition against.",
+                    "maxLength": 255,
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                },
+                "createdDateTime": {
+                    "format": "date-time",
+                    "description": "Read only. The date and time when the product recognition run was first created, in UTC.",
+                    "type": "string"
+                },
+                "updatedDateTime": {
+                    "format": "date-time",
+                    "description": "Read only. The date and time when the product recognition run was last updated, in UTC.",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Read only. The current state of the product recognition run.",
+                    "enum": [
+                        "notStarted",
+                        "running",
+                        "succeeded",
+                        "failed"
+                    ],
+                    "type": "string"
+                },
+                "error": {
+                    "$ref": "#/definitions/ErrorResponseDetails"
+                },
+                "result": {
+                    "$ref": "#/definitions/ProductRecognitionResultApiModel"
+                }
+            }
+        },
+        "ProductRecognitionApiModelCollectionApiModel": {
+            "description": "Contains an array of results that may be paginated.",
+            "required": [
+                "value"
+            ],
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "The array of results.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ProductRecognitionApiModel"
+                    }
+                },
+                "nextLink": {
+                    "description": "A link to the next set of paginated results, if there are more results available; not present otherwise.",
+                    "type": "string"
+                }
+            }
+        },
+        "ProductRecognitionResultApiModel": {
+            "description": "Results from the product understanding operation.",
+            "required": [
+                "gaps",
+                "imageMetadata",
+                "products"
+            ],
+            "type": "object",
+            "properties": {
+                "imageMetadata": {
+                    "$ref": "#/definitions/ImageMetadataApiModel"
+                },
+                "products": {
+                    "description": "Products detected in the image.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DetectedObject"
+                    }
+                },
+                "gaps": {
+                    "description": "Gaps detected in the image.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DetectedObject"
+                    }
+                }
+            }
+        },
+        "ReadResult": {
+            "description": "The results of an Read operation.",
+            "required": [
+                "content",
+                "pages",
+                "stringIndexType"
+            ],
+            "type": "object",
+            "properties": {
+                "stringIndexType": {
+                    "description": "The method used to compute string offset and length, possible values include: 'textElements', 'unicodeCodePoint', 'utf16CodeUnit' etc.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "content": {
+                    "description": "Concatenate string representation of all textual and visual elements in reading order.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "pages": {
+                    "description": "A list of analyzed pages.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentPage"
+                    }
+                },
+                "styles": {
+                    "description": "Extracted font styles.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentStyle"
+                    }
+                }
+            }
+        },
+        "SingleVectorResultApiModel": {
+            "description": "Results of image vectorization.",
+            "type": "object",
+            "properties": {
+                "vector": {
+                    "description": "Vector of the image.",
+                    "type": "array",
+                    "items": {
+                        "format": "float",
+                        "type": "number"
+                    }
+                },
+                "modelVersion": {
+                    "description": "Model version.",
+                    "type": "string"
+                }
+            }
+        },
+        "SmartCropsResult": {
+            "description": "Smart cropping result.",
+            "required": [
+                "values"
+            ],
+            "type": "object",
+            "properties": {
+                "values": {
+                    "description": "Recommended regions for cropping the image.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CropRegion"
+                    }
+                }
+            }
+        },
+        "Tag": {
+            "description": "An entity observation in the image, along with the confidence score.",
+            "required": [
+                "confidence",
+                "name"
+            ],
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "Name of the entity.",
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "confidence": {
+                    "format": "double",
+                    "description": "The level of confidence that the entity was observed.",
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "TagsResult": {
+            "description": "A list of tags with confidence level.",
+            "required": [
+                "values"
+            ],
+            "type": "object",
+            "properties": {
+                "values": {
+                    "description": "A list of tags with confidence level.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Tag"
+                    }
+                }
+            }
+        },
+        "VectorizeTextRequestApiModel": {
+            "description": "Model for VectorizeText request.",
+            "required": [
+                "text"
+            ],
+            "type": "object",
+            "properties": {
+                "text": {
+                    "description": "Text for vectorization.",
+                    "minLength": 1,
+                    "type": "string"
+                }
+            },
+            "example": "{\r\n  \"text\": \"string\"\r\n}"
+        },
+        "CreateIngestionIndexRequestModel": {
+            "description": "Represents the create ingestion index request model for the JSON document.",
+            "type": "object",
+            "properties": {
+                "metadataSchema": {
+                    "$ref": "#/definitions/MetadataSchemaModel"
+                },
+                "features": {
+                    "description": "Gets or sets the list of features for the document. Default is \"vision\".",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "userData": {
+                    "description": "Gets or sets the user data for the document.",
+                    "type": "object",
+                    "additionalProperties": {}
+                }
+            }
+        },
+        "CreateIngestionRequestModel": {
+            "description": "Represents the create ingestion request model for the JSON document.",
+            "type": "object",
+            "properties": {
+                "videos": {
+                    "description": "Gets or sets the list of video document ingestion requests in the JSON document.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IngestionDocumentRequestModel"
+                    }
+                },
+                "images": {
+                    "description": "Gets or sets the list of image document ingestion requests in the JSON document.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IngestionDocumentRequestModel"
+                    }
+                }
+            }
+        },
+        "DatetimeFilterModel": {
+            "description": "Represents a datetime filter to apply on a search query.",
+            "type": "object",
+            "properties": {
+                "fieldName": {
+                    "description": "Gets or sets the name of the field to filter on.",
+                    "type": "string"
+                },
+                "startTime": {
+                    "description": "Gets or sets the start time of the range to filter on.",
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "Gets or sets the end time of the range to filter on.",
+                    "type": "string"
+                }
+            }
+        },
+        "FeatureModel": {
+            "description": "Represents a feature in the JSON document.",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "Gets or sets the name of the feature.",
+                    "type": "string"
+                },
+                "modelVersion": {
+                    "description": "Gets or sets the model version of the feature.",
+                    "type": "string"
+                }
+            }
+        },
+        "GetIngestionIndexResponseModel": {
+            "description": "Represents the get ingestion index response model for the JSON document.",
+            "required": [
+                "createdDateTime",
+                "eTag",
+                "lastModifiedDateTime"
+            ],
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "Gets or sets the index name property.",
+                    "type": "string"
+                },
+                "metadataSchema": {
+                    "$ref": "#/definitions/MetadataSchemaModel"
+                },
+                "userData": {
+                    "description": "Gets or sets the user data for the document.",
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "features": {
+                    "description": "Gets or sets the list of features in the JSON document.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FeatureModel"
+                    }
+                },
+                "eTag": {
+                    "description": "Gets or sets the etag.",
+                    "type": "string"
+                },
+                "createdDateTime": {
+                    "format": "date-time",
+                    "description": "Gets or sets the created date and time property.",
+                    "type": "string"
+                },
+                "lastModifiedDateTime": {
+                    "format": "date-time",
+                    "description": "Gets or sets the last modified date and time property.",
+                    "type": "string"
+                }
+            }
+        },
+        "GetIngestionIndexResponseModelCollectionApiModel": {
+            "description": "Contains an array of results that may be paginated.",
+            "required": [
+                "value"
+            ],
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "The array of results.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/GetIngestionIndexResponseModel"
+                    }
+                },
+                "nextLink": {
+                    "description": "A link to the next set of paginated results, if there are more results available; not present otherwise.",
+                    "type": "string"
+                }
+            }
+        },
+        "IngestionDocumentRequestModel": {
+            "description": "Represents a video or image document ingestion request in the JSON document.",
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "description": "Gets or sets the mode of the document (add, remove, update).",
+                    "type": "string"
+                },
+                "documentId": {
+                    "description": "Gets or sets the document ID.",
+                    "type": "string"
+                },
+                "documentUrl": {
+                    "format": "uri",
+                    "description": "Gets or sets the document URL. Shared access signature (SAS), if any, will be removed from the URL.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Gets or sets the metadata for the document as a dictionary of name-value pairs.",
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "userData": {
+                    "description": "Gets or sets the user data for the document.",
+                    "type": "object",
+                    "additionalProperties": {}
+                }
+            }
+        },
+        "IngestionDocumentResponseModel": {
+            "description": "Represents an ingestion document response object in the JSON document.",
+            "required": [
+                "eTag"
+            ],
+            "type": "object",
+            "properties": {
+                "documentUrl": {
+                    "format": "uri",
+                    "description": "Gets or sets the document URL. Shared access signature (SAS), if any, will be removed from the URL.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Gets or sets the key-value pairs of metadata.",
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "state": {
+                    "description": "Gets or sets the state of the document.",
+                    "enum": [
+                        "notStarted",
+                        "running",
+                        "completed",
+                        "failed"
+                    ],
+                    "type": "string"
+                },
+                "eTag": {
+                    "description": "Gets or sets the etag.",
+                    "type": "string"
+                },
+                "error": {
+                    "$ref": "#/definitions/ErrorResponseDetails"
+                },
+                "createdDateTime": {
+                    "format": "date-time",
+                    "description": "Gets or sets the created date and time of the document.",
+                    "type": "string"
+                },
+                "lastModifiedDateTime": {
+                    "format": "date-time",
+                    "description": "Gets or sets the last modified date and time of the document.",
+                    "type": "string"
+                },
+                "userData": {
+                    "description": "Gets or sets the user data for the document.",
+                    "type": "object",
+                    "additionalProperties": {}
+                }
+            }
+        },
+        "IngestionDocumentResponseModelCollectionApiModel": {
+            "description": "Contains an array of results that may be paginated.",
+            "required": [
+                "value"
+            ],
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "The array of results.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IngestionDocumentResponseModel"
+                    }
+                },
+                "nextLink": {
+                    "description": "A link to the next set of paginated results, if there are more results available; not present otherwise.",
+                    "type": "string"
+                }
+            }
+        },
+        "IngestionResponseModel": {
+            "description": "Represents the ingestion response model for the JSON document.",
+            "required": [
+                "eTag"
+            ],
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "Gets or sets the name of the ingestion.",
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Gets or sets the state of the ingestion.",
+                    "enum": [
+                        "notStarted",
+                        "running",
+                        "completed",
+                        "failed"
+                    ],
+                    "type": "string"
+                },
+                "eTag": {
+                    "description": "Gets or sets the etag.",
+                    "type": "string"
+                },
+                "error": {
+                    "$ref": "#/definitions/ErrorResponseDetails"
+                },
+                "createdDateTime": {
+                    "format": "date-time",
+                    "description": "Gets or sets the created date and time of the ingestion.",
+                    "type": "string"
+                },
+                "lastModifiedDateTime": {
+                    "format": "date-time",
+                    "description": "Gets or sets the last modified date and time of the ingestion.",
+                    "type": "string"
+                }
+            }
+        },
+        "IngestionResponseModelCollectionApiModel": {
+            "description": "Contains an array of results that may be paginated.",
+            "required": [
+                "value"
+            ],
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "The array of results.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IngestionResponseModel"
+                    }
+                },
+                "nextLink": {
+                    "description": "A link to the next set of paginated results, if there are more results available; not present otherwise.",
+                    "type": "string"
+                }
+            }
+        },
+        "MetadataSchemaFieldModel": {
+            "description": "Represents a field in the metadata schema.",
+            "required": [
+                "filterable",
+                "searchable",
+                "type"
+            ],
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "Gets or sets the name of the field.",
+                    "type": "string"
+                },
+                "searchable": {
+                    "description": "Gets or sets a value indicating whether the field is searchable.",
+                    "type": "boolean"
+                },
+                "filterable": {
+                    "description": "Gets or sets a value indicating whether the field is filterable.",
+                    "type": "boolean"
+                },
+                "type": {
+                    "description": "Gets or sets the type of the field. It could be string or datetime.",
+                    "enum": [
+                        "string",
+                        "datetime"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "MetadataSchemaModel": {
+            "description": "Represents the metadata schema for the document.",
+            "type": "object",
+            "properties": {
+                "language": {
+                    "description": "Gets or sets the language of the metadata schema. Default is \"en\".",
+                    "type": "string"
+                },
+                "fields": {
+                    "description": "Gets or sets the list of fields in the metadata schema.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/MetadataSchemaFieldModel"
+                    }
+                }
+            }
+        },
+        "SearchFiltersModel": {
+            "description": "Represents the filters to apply on a search query.",
+            "type": "object",
+            "properties": {
+                "stringFilters": {
+                    "description": "Gets or sets the string filters to apply on the search query.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/StringFilterModel"
+                    }
+                },
+                "datetimeFilters": {
+                    "description": "Gets or sets the datetime filters to apply on the search query.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DatetimeFilterModel"
+                    }
+                },
+                "featureFilters": {
+                    "description": "Gets or sets the feature filters to apply on the search query.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "SearchQueryImageRequestModel": {
+            "description": "Represents a search query request model for image-based search.",
+            "type": "object",
+            "properties": {
+                "queryImage": {
+                    "description": "Gets or sets the base64 string representation of the query image. This property is optional.",
+                    "type": "string"
+                },
+                "queryImageUrl": {
+                    "format": "uri",
+                    "description": "Gets or sets the URL of the query image. This property is optional.",
+                    "type": "string"
+                },
+                "moderation": {
+                    "description": "Gets or sets a boolean value indicating whether the moderation is enabled or disabled.",
+                    "type": "boolean"
+                },
+                "filters": {
+                    "$ref": "#/definitions/SearchFiltersModel"
+                },
+                "top": {
+                    "format": "int32",
+                    "description": "Gets or sets the number of results to retrieve.",
+                    "type": "integer"
+                },
+                "skip": {
+                    "format": "int32",
+                    "description": "Gets or sets the number of results to skip.",
+                    "type": "integer"
+                },
+                "additionalIndexNames": {
+                    "description": "Gets or sets the additional index names to include in the search query.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "SearchQueryTextRequestModel": {
+            "description": "Represents a search query request model for text-based search.",
+            "type": "object",
+            "properties": {
+                "queryText": {
+                    "description": "Gets or sets the query text.",
+                    "type": "string"
+                },
+                "filters": {
+                    "$ref": "#/definitions/SearchFiltersModel"
+                },
+                "moderation": {
+                    "description": "Gets or sets a boolean value indicating whether the moderation is enabled or disabled.",
+                    "type": "boolean"
+                },
+                "top": {
+                    "format": "int32",
+                    "description": "Gets or sets the number of results to retrieve.",
+                    "type": "integer"
+                },
+                "skip": {
+                    "format": "int32",
+                    "description": "Gets or sets the number of results to skip.",
+                    "type": "integer"
+                },
+                "additionalIndexNames": {
+                    "description": "Gets or sets the additional index names to include in the search query.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "SearchResultDocumentModel": {
+            "description": "Represents a search query response.",
+            "required": [
+                "relevance"
+            ],
+            "type": "object",
+            "properties": {
+                "documentId": {
+                    "description": "Gets or sets the ID of the document.",
+                    "type": "string"
+                },
+                "documentKind": {
+                    "description": "Gets or sets the kind of the document, which can be \"video\" or \"image\".",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "description": "Gets or sets the timestamp of the document. This property is only applicable for video documents.",
+                    "type": "string"
+                },
+                "relevance": {
+                    "format": "double",
+                    "description": "Gets or sets the relevance score of the document.",
+                    "type": "number"
+                }
+            }
+        },
+        "SearchResultDocumentModelCollectionApiModel": {
+            "description": "Contains an array of results that may be paginated.",
+            "required": [
+                "value"
+            ],
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "The array of results.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SearchResultDocumentModel"
+                    }
+                },
+                "nextLink": {
+                    "description": "A link to the next set of paginated results, if there are more results available; not present otherwise.",
+                    "type": "string"
+                }
+            }
+        },
+        "StringFilterModel": {
+            "description": "Represents a string filter to apply on a search query.",
+            "type": "object",
+            "properties": {
+                "fieldName": {
+                    "description": "Gets or sets the name of the field to filter on.",
+                    "type": "string"
+                },
+                "values": {
+                    "description": "Gets or sets the values to filter on.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "UpdateIngestionIndexRequestModel": {
+            "description": "Represents the update ingestion index request model for the JSON document.",
+            "type": "object",
+            "properties": {
+                "metadataSchema": {
+                    "$ref": "#/definitions/MetadataSchemaModel"
+                },
+                "userData": {
+                    "description": "Gets or sets the user data for the document.",
+                    "type": "object",
+                    "additionalProperties": {}
+                }
+            }
+        },
+        "Imageanalysis-segmentPost200ImagePngResponse": {
+            "type": "file"
+        },
+        "Imagecomposition-stitchPost200ImageJpegResponse": {
+            "type": "file"
+        },
+        "Imagecomposition-rectifyPost200ImageJpegResponse": {
+            "type": "file"
         }
     },
     "tags": []
