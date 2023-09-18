@@ -40,6 +40,13 @@ class VisionApi:
         if result.objects is not None:
             return result.objects
 
+    def DetectText(self, vision_source):
+        image_analysis_options = sdk.ImageAnalysisOptions()
+        image_analysis_options.features = sdk.ImageAnalysisFeature.TEXT
+        result = self.AnalyzeImage(vision_source, image_analysis_options)
+        if result.objects is not None:
+            return result.objects
+
 # load_dotenv()
 
 # vision = VisionApi(os.getenv("VISION_ENDPOINT"), os.getenv("VISION_KEY"))

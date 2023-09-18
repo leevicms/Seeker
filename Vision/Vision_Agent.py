@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import VisionApi
 load_dotenv()
 
 from langchain.chat_models import AzureChatOpenAI
@@ -53,7 +54,7 @@ def extract_parameters_string(swagger_data_str: str) -> str:
     swagger_data = json.loads(read_swagger_file_to_string())
     endpoint_parameters = {}
     paths = swagger_data.get('paths', {})
-    
+
     for path, methods in paths.items():
         for method, details in methods.items():
             params = details.get('parameters', [])
@@ -91,7 +92,7 @@ def extract_response_status_codes_string(swagger_data_str: str) -> str:
                 status_codes[status_code] = description
             endpoint_key = f"{path}::{method.upper()}"
             endpoint_responses[endpoint_key] = status_codes
-            
+
     return json.dumps(endpoint_responses)
 
 @tool
@@ -114,17 +115,26 @@ def extract_request_body_schema_string(swagger_data_str: str) -> str:
     return json.dumps(endpoint_request_body)
 
 @tool
-def search_product_info(product_name: str) -> str:
+def call_vision_api(api_name: str)->str:
     """
-    This function browse the web to search the information related to a product
+    This function calls the specific vision API you want to call, but you must give the details of the API.
+    The API name, its endpoint, method, parameters, and request body schema are required.
     """
+    vision_api = VisionApi(os.getenv("VISION_ENDPOINT"), os.getenv("VISION_KEY"))
+    return vision_api.DetectText()
 
-    return "The rela"
+image_path = "WIN_20230918_01_14_18_Pro.jpg"
+@tool
+def take_image(image_path: str) -> str:
+    """
+    This function takes an image and saves the image at the path of you specified, which is image_path
+    """ 
+    return image_path
 
-tools = [extract_endpoints_and_methods_string, extract_parameters_string, extract_response_status_codes_string, extract_request_body_schema_string]
+tools = [extract_endpoints_and_methods_string, extract_parameters_string, extract_response_status_codes_string, extract_request_body_schema_string, call_vision_api]
 agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
 
-agent.run("I want to find the lowest caloried drink in an image")
+agent.run("You are the robot controller, and you need to handle the user request of this Can you point out the drink with the lowest calories since I'm on a diet?")
 # swagger_data = read_swagger_file("random")
 # endpoints = extract_endpoints_and_methods(swagger_data)
 # parameters = extract_parameters(swagger_data)
